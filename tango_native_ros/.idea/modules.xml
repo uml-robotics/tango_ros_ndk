@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file:///hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros/tango_native_ros.iml" filepath="/hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros/tango_native_ros.iml" />
+      <module fileurl="file:///hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros/tango_native_streaming/tango_native_streaming.iml" filepath="/hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros/tango_native_streaming/tango_native_streaming.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="/hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros" />
+            <option value="/hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros/tango_native_streaming" />
+          </set>
+        </option>
+        <option name="myModules">
+          <set>
+            <option value="/hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros" />
+            <option value="/hd2/home/carlos/android-dev/tango_ros_ndk/tango_native_ros/tango_native_streaming" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

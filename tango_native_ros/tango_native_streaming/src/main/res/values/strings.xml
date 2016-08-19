@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tango Native ROS Streaming</string>
+    <string name="app_name_long">Tango Native ROS (Pose and Depth) Streaming</string>
+    <string name="text_message">Started Streaming!</string>
+</resources>
