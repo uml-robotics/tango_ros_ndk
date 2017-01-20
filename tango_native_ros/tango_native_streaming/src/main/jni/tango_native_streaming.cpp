@@ -75,14 +75,10 @@ void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   int ret;
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
   ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
-  /*if (ret != TANGO_SUCCESS)
+  if (ret != TANGO_SUCCESS)
   {
     LOGE("ERROR UPDATING TANGO MANAGER");
   }
-  else
-  {
-    LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
-  }*/
 }
 
 void onPoseAvailable(void* context, const TangoPoseData *pose) {
@@ -148,9 +144,108 @@ void* pub_thread_method(void* arg)
 
 namespace tango_native_streaming {
 
-void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity)
-{
-  LOGI("Starting...");
+//TODO: Run ROS initialization on separate thread so Android does not complain
+void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
+  int seq = 0;
+  sensor_msgs::PointField x, y, z;
+  x.name = "x";
+  y.name = "y";
+  z.name = "z";
+  x.offset = 0;
+  y.offset = sizeof(float);
+  z.offset = 2.0*sizeof(float);
+  x.count = y.count = z.count = 1;
+  x.datatype = y.datatype = z.datatype = sensor_msgs::PointField::FLOAT32;
+  pc_msg.header.frame_id = TANGO_PREFIX"tango_camera_depth";
+  pc_msg.height = 1;
+  pc_msg.is_bigendian = false;
+  pc_msg.is_dense = true;
+  pc_msg.point_step = 3 * sizeof(float);
+  pc_msg.fields.push_back(x);
+  pc_msg.fields.push_back(y);
+  pc_msg.fields.push_back(z);
+  tango_config_ = TangoService_getConfig(TANGO_CONFIG_DEFAULT);
+  pthread_mutex_init(&pose_mutex, NULL);
+  int32_t max_point_cloud_elements;
+  int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
+                                       &max_point_cloud_elements);
+  if(ret != TANGO_SUCCESS) {
+    LOGE("Failed to query maximum number of point cloud elements.");
+  }
+
+  ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
+  if(ret != TANGO_SUCCESS) {
+      LOGE("Failed to create support point cloud manager");
+  }
+
+  int argc = 3;
+  char *argv[] = {"nothing_important" , "__master:=" ROS_MASTER, "__ip:=" ROS_IP};
+  LOGI("GOING TO ROS INIT");
+
+  for(int i = 0; i < argc; i++){
+      LOGI("%s", argv[i]);
+  }
+  ros::init(argc, &argv[0], NAMESPACE);
+
+  LOGI("GOING TO NODEHANDLE");
+
+  // %Tag(ROS_MASTER)%
+  std::string master_uri = ros::master::getURI();
+
+  if(ros::master::check()){
+      LOGI("ROS MASTER IS UP!");
+  } else {
+      LOGI("NO ROS MASTER.");
+  }
+  LOGI("%s", master_uri.c_str());
+  ctxt.pose_mutex_ptr = &pose_mutex;
+  ctxt.odom_to_base_ptr = &odom_to_base;
+  ctxt.nh = new ros::NodeHandle(NAMESPACE);
+  tf_bcaster = new tf2_ros::TransformBroadcaster;
+  static_tf_bcaster = new tf2_ros::StaticTransformBroadcaster;
+  tf_buffer = new tf2_ros::Buffer;
+  tf_listener = new tf2_ros::TransformListener(*tf_buffer);
+  map_to_odom.header.frame_id = "map";
+  map_to_odom.child_frame_id = TANGO_PREFIX"odom";
+  map_to_odom.transform.translation.x = 0;
+  map_to_odom.transform.translation.y = 0;
+  map_to_odom.transform.translation.z = 0;
+  map_to_odom.transform.rotation.x = 0;
+  map_to_odom.transform.rotation.y = 0;
+  map_to_odom.transform.rotation.z = 0;
+  map_to_odom.transform.rotation.w = 1;
+  odom_to_base.header.frame_id = TANGO_PREFIX"odom";
+  odom_to_base.child_frame_id = TANGO_PREFIX"tango_base_link";
+  odom_to_base.transform.translation.x = 0;
+  odom_to_base.transform.translation.y = 0;
+  odom_to_base.transform.translation.z = 0;
+  odom_to_base.transform.rotation.x = 0;
+  odom_to_base.transform.rotation.y = 0;
+  odom_to_base.transform.rotation.z = 0;
+  odom_to_base.transform.rotation.w = 1;
+  base_to_pose.header.frame_id = TANGO_PREFIX"tango_base_link";
+  base_to_pose.child_frame_id = TANGO_PREFIX"tango_pose";
+  base_to_pose.transform.translation.x = 0;
+  base_to_pose.transform.translation.y = 0;
+  base_to_pose.transform.translation.z = 0;
+  base_to_pose.transform.rotation.x = -0.5;
+  base_to_pose.transform.rotation.y = 0.5;
+  base_to_pose.transform.rotation.z = 0.5;
+  base_to_pose.transform.rotation.w = 0.5;
+  base_to_depth.header.frame_id = TANGO_PREFIX"tango_base_link";
+  base_to_depth.child_frame_id = TANGO_PREFIX"tango_camera_depth";
+  base_to_color.header.frame_id = TANGO_PREFIX"tango_base_link";
+  base_to_color.child_frame_id = TANGO_PREFIX"tango_camera_color";
+  pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
+  known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
+  int version = 0;
+  TangoErrorType err = TangoSupport_GetTangoVersion(env, caller_activity, &version);
+  if (err != TANGO_SUCCESS || version < kTangoCoreMinimumVersion) {
+    LOGE(
+        "TangoNativeStreamingApp::OnCreate, Tango Core version is out"
+        " of date.");
+    std::exit(EXIT_SUCCESS);
+  }
 }
 
 void TangoNativeStreamingApp::SetCurrentPoseCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr& known_pose)
@@ -466,4 +561,4 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
     std::exit(EXIT_SUCCESS);
   }
 }
-}  // namespace 
+}  // namespace

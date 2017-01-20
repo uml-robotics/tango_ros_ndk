@@ -33,6 +33,7 @@
 
 #include <android/log.h>
 #include <pthread.h>
+#include <jni.h>
 
 //TANGO INCLUDES
 #include "tango_client_api.h" 
