@@ -41,10 +41,10 @@
 
 //TODO: Set these through Java UI instead
 //set to ROS_MASTER uri (including http:// and port)
-#define ROS_MASTER "http://10.185.0.249:11311"
+#define ROS_MASTER "http://10.185.0.145:11311"
 
 //set to Tango's IP
-#define ROS_IP "10.185.0.224"
+#define ROS_IP "10.185.0.249"
 
 //optional, prefixes tf names with it, must either be empty, or end in a forward slash /
 #define TANGO_PREFIX "tango_brain_0/"
