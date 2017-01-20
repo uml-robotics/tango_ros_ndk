@@ -4,7 +4,7 @@ PROJECT_ROOT:= $(call my-dir)/../../../../..
 include $(CLEAR_VARS)
 LOCAL_MODULE := tango_client_api
 LOCAL_SRC_FILES := $(PROJECT_ROOT)/EXTRACT_TANGO_CLIENT_LIBRARY_HERE/libtango_client_api/armeabi-v7a/libtango_client_api.so
-LOCAL_EXPORT_C_INCLUDES += $(PROJECT_ROOT)/EXTRACT_TANGO_CLIENT_LIBRARY_HERE/libtango_client_api/armeabi-v7a
+LOCAL_EXPORT_C_INCLUDES += $(PROJECT_ROOT)/EXTRACT_TANGO_CLIENT_LIBRARY_HERE/libtango_client_api
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)

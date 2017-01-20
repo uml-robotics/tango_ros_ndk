@@ -50,10 +50,10 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := tango_support_api
 ifeq ($(TARGET_ARCH),x86)
     LOCAL_SRC_FILES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/libtango_support_api/x86/libtango_support_api.so
-    LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/libtango_support_api/x86
+    LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/libtango_support_api
 else
     LOCAL_SRC_FILES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/libtango_support_api/armeabi-v7a/libtango_support_api.so
-    LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/libtango_support_api/armeabi-v7a
+    LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/libtango_support_api
 endif
 include $(PREBUILT_SHARED_LIBRARY)
 
