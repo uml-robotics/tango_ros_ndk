@@ -63,11 +63,11 @@ void onPointCloudAvailable(void* context, const TangoXYZij* point_cloud) {
   float average_depth;
   int ret;
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
-  ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
+/*  ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
   if (ret != TANGO_SUCCESS)
   {
     LOGE("ERROR UPDATING TANGO MANAGER");
-  }
+  }*/
 }
 
 void onPoseAvailable(void* context, const TangoPoseData *pose) {
@@ -95,7 +95,7 @@ void* pub_thread_method(void* arg)
     bool new_available;
     while (ros::ok())
     {
-        ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
+        /*ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
         if (ret != TANGO_SUCCESS)
         {
             LOGE("Error retrieving latest pointcloud");
@@ -109,7 +109,7 @@ void* pub_thread_method(void* arg)
             app->pc_msg.data.resize(3* sizeof(float) * pc_ptr->xyz_count);
             memcpy(&app->pc_msg.data[0], (void*)pc_ptr->xyz,  pc_ptr->xyz_count * 3 * sizeof(float));
             app->pc_pub.publish(app->pc_msg);
-        }
+        }*/
         pthread_mutex_lock(&(app->pose_mutex));
         app->map_to_odom.header.seq = app->map_to_odom_seq++;
         app->odom_to_base.header.seq = app->odom_to_base_seq++;
@@ -147,7 +147,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   pc_msg.fields.push_back(z);
   tango_config_ = TangoService_getConfig(TANGO_CONFIG_DEFAULT);
   pthread_mutex_init(&pose_mutex, NULL);
-  int32_t max_point_cloud_elements;
+  /*int32_t max_point_cloud_elements;
   int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
                                        &max_point_cloud_elements);
   if(ret != TANGO_SUCCESS) {
@@ -157,10 +157,10 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
   if(ret != TANGO_SUCCESS) {
       LOGE("Failed to create support point cloud manager");
-  }
+  }*/
 
   int argc = 3;
-  char *argv[] = {"nothing_important" , "__master:=" ROS_MASTER, "__ip:=" ROS_IP};
+  char *argv[] = {(char*)"nothing_important" , (char*)"__master:=" ROS_MASTER, (char*)"__ip:=" ROS_IP};
   LOGI("GOING TO ROS INIT");
 
   for(int i = 0; i < argc; i++){
