@@ -57,17 +57,13 @@ namespace {
 // The minimum Tango Core version required from this application.
 constexpr int kTangoCoreMinimumVersion = 9377;
 
-void onPointCloudAvailable(void* context, const TangoXYZij* point_cloud) {
-  // Number of points in the point cloud.
-  int point_cloud_size;
-  float average_depth;
-  int ret;
+void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
-/*  ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
+  int ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
   if (ret != TANGO_SUCCESS)
   {
     LOGE("ERROR UPDATING TANGO MANAGER");
-  }*/
+  }
 }
 
 void onPoseAvailable(void* context, const TangoPoseData *pose) {
@@ -91,25 +87,27 @@ void* pub_thread_method(void* arg)
     app = (tango_native_streaming::TangoNativeStreamingApp*) arg;
     ros::Rate rate(10);
     TangoErrorType ret;
-    TangoXYZij* pc_ptr;
+    TangoPointCloud* pc_ptr;
     bool new_available;
     while (ros::ok())
     {
-        /*ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
+        ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
         if (ret != TANGO_SUCCESS)
         {
             LOGE("Error retrieving latest pointcloud");
         }
         if (new_available)
         {
-            app->pc_msg.width = app->pc_msg.row_step = pc_ptr->xyz_count;
+            //LOGI("New Point Cloud Available!");
+            app->pc_msg.width = app->pc_msg.row_step = pc_ptr->num_points;
             app->pc_msg.header.seq = app->seq++;
             app->pc_msg.header.stamp = ros::Time::now();
             //LOGI("Header stamp: %f", app->pc_msg.header.stamp.toSec());
-            app->pc_msg.data.resize(3* sizeof(float) * pc_ptr->xyz_count);
-            memcpy(&app->pc_msg.data[0], (void*)pc_ptr->xyz,  pc_ptr->xyz_count * 3 * sizeof(float));
+            int size = 4 * sizeof(float) * pc_ptr->num_points;
+            app->pc_msg.data.resize(size);
+            memcpy(&app->pc_msg.data[0], (void*)pc_ptr->points, size);
             app->pc_pub.publish(app->pc_msg);
-        }*/
+        }
         pthread_mutex_lock(&(app->pose_mutex));
         app->map_to_odom.header.seq = app->map_to_odom_seq++;
         app->odom_to_base.header.seq = app->odom_to_base_seq++;
@@ -128,36 +126,30 @@ namespace tango_native_streaming {
 //TODO: Run ROS initialization on separate thread so Android does not complain
 void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   int seq = 0;
-  sensor_msgs::PointField x, y, z;
+  sensor_msgs::PointField x, y, z, c;
   x.name = "x";
   y.name = "y";
   z.name = "z";
+  c.name = "c";
   x.offset = 0;
   y.offset = sizeof(float);
   z.offset = 2.0*sizeof(float);
-  x.count = y.count = z.count = 1;
-  x.datatype = y.datatype = z.datatype = sensor_msgs::PointField::FLOAT32;
+  c.offset = 3.0*sizeof(float);
+  x.count = y.count = z.count = c.count = 1;
+  x.datatype = y.datatype = z.datatype = c.datatype = sensor_msgs::PointField::FLOAT32;
   pc_msg.header.frame_id = TANGO_PREFIX"tango_camera_depth";
   pc_msg.height = 1;
   pc_msg.is_bigendian = false;
   pc_msg.is_dense = true;
-  pc_msg.point_step = 3 * sizeof(float);
+  pc_msg.point_step = 4 * sizeof(float);
   pc_msg.fields.push_back(x);
   pc_msg.fields.push_back(y);
   pc_msg.fields.push_back(z);
+  pc_msg.fields.push_back(c);
   tango_config_ = TangoService_getConfig(TANGO_CONFIG_DEFAULT);
   pthread_mutex_init(&pose_mutex, NULL);
-  /*int32_t max_point_cloud_elements;
-  int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
-                                       &max_point_cloud_elements);
-  if(ret != TANGO_SUCCESS) {
-    LOGE("Failed to query maximum number of point cloud elements.");
-  }
+  int ret;
 
-  ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
-  if(ret != TANGO_SUCCESS) {
-      LOGE("Failed to create support point cloud manager");
-  }*/
 
   int argc = 3;
   char *argv[] = {(char*)"nothing_important" , (char*)"__master:=" ROS_MASTER, (char*)"__ip:=" ROS_IP};
@@ -291,12 +283,31 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
     std::exit(EXIT_SUCCESS);
   }
 
-  err = TangoService_connectOnXYZijAvailable(onPointCloudAvailable);
+  err = TangoConfig_setInt32(tango_config_, "config_depth_mode", TANGO_POINTCLOUD_XYZC);
   if (err != TANGO_SUCCESS) {
-    LOGE(
-        "TangoNativeStreamingApp::OnTangoServiceConnected,"
-        "Failed to connect to point cloud callback with error code: %d",
-        err);
+    LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
+    std::exit(EXIT_SUCCESS);
+  }
+
+
+  int32_t max_point_cloud_elements;
+  int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
+                                         &max_point_cloud_elements);
+  if(ret != TANGO_SUCCESS) {
+    LOGE("Failed to query maximum number of point cloud elements, with error %d", ret);
+  }
+  else
+  {
+    LOGI("Max Point Cloud elements = %d", max_point_cloud_elements);
+  }
+  ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
+  if(ret != TANGO_SUCCESS) {
+      LOGE("Failed to create support point cloud manager");
+  }
+
+  err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
+  if (err != TANGO_SUCCESS) {
+    LOGE( "Failed to connect to point cloud callback with error code: %d", err);
     std::exit(EXIT_SUCCESS);
   }
 
@@ -366,4 +377,4 @@ void TangoNativeStreamingApp::OnPause() {
   pthread_join(pub_thread, NULL);
   LOGI("Done");
 }
-}  // namespace 
+}  // namespace
