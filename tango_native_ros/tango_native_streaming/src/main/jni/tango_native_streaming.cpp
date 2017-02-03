@@ -41,6 +41,8 @@
 
 #include <tf/transform_datatypes.h>
 
+#include <endian.h>
+
 char *ROS_MASTER_URI_PREFIX = "__master:=",
      *ROS_IP_URI_PREFIX = "__ip:=",
      *TANGO_CAMERA_DEPTH_SUFFIX = "tango_camera_depth",
@@ -67,6 +69,43 @@ namespace {
 
 // The minimum Tango Core version required from this application.
 constexpr int kTangoCoreMinimumVersion = 9377;
+
+void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *buffer)
+{
+  if (id == TANGO_CAMERA_COLOR)
+  {
+    tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
+    if (!ctxt->image_manager_ready)
+    {
+      LOGI("Setting up Image Message, received image format is %d", buffer->format);
+      ctxt->img_msg_ptr->header.frame_id = TANGO_PREFIX"tango_camera_color";
+      ctxt->img_msg_ptr->height = buffer->height;
+      ctxt->img_msg_ptr->width = buffer->width;
+      switch (buffer->format)
+      {
+        case TANGO_HAL_PIXEL_FORMAT_RGBA_8888 : ctxt->img_msg_ptr->encoding = "rgba8";
+                                                break;
+        case TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP : ctxt->img_msg_ptr->encoding = "rgb8"; //Will convert
+                                                break;
+        case TANGO_HAL_PIXEL_FORMAT_YV12 : ctxt->img_msg_ptr->encoding = "YV12";
+                                                LOGE("Image format is YV21 for which a conversion is not implemented, standard ROS tools wont process the video");
+                                                break;
+      }
+      if (_BYTE_ORDER == _BIG_ENDIAN)
+        ctxt->img_msg_ptr->is_bigendian = 1;
+      else
+        ctxt->img_msg_ptr->is_bigendian = 0;
+      ctxt->img_msg_ptr->step = buffer->stride;
+      TangoSupport_createImageBufferManager(buffer->format, ctxt->img_msg_ptr->width, ctxt->img_msg_ptr->height, &ctxt->image_manager);
+      ctxt->image_manager_ready = true;
+    }
+    int ret = TangoSupport_updateImageBuffer(ctxt->image_manager, buffer);
+    if (ret != TANGO_SUCCESS)
+    {
+      LOGE("ERROR UPDATING TANGO IMAGE MANAGER");
+    }
+  }
+}
 
 void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   // Number of points in the point cloud.
@@ -103,7 +142,10 @@ void* pub_thread_method(void* arg)
     ros::Rate rate(10);
     TangoErrorType ret;
     TangoPointCloud* pc_ptr;
+    TangoImageBuffer* img_ptr;
     bool new_available;
+    bool img_size_computed = false;
+    int size;
     running = true;
     while (running)
     {
@@ -126,6 +168,40 @@ void* pub_thread_method(void* arg)
             app->pc_msg.data.resize(size);
             memcpy(&app->pc_msg.data[0], (void*)pc_ptr->points, size);
             app->pc_pub.publish(app->pc_msg);
+        }
+        if (app->ctxt.image_manager_ready)
+        {
+            ret = TangoSupport_getLatestImageBufferAndNewDataFlag((app->ctxt).image_manager, &img_ptr, &new_available);
+            if (ret != TANGO_SUCCESS)
+            {
+                LOGE("Error retrieving latest color image");
+            }
+            if (new_available)
+            {
+                if (!img_size_computed)
+                {
+                    int bytes_per_pixel;
+                    if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_RGBA_8888)
+                    {
+                        bytes_per_pixel = 4;
+                    }
+                    else //means it is NV21 or YV12
+                    {
+                        bytes_per_pixel = 3;
+                    }
+                    size = bytes_per_pixel * sizeof(uint8_t) * img_ptr->height * img_ptr->width;
+                    app->img_msg.data.resize(size);
+                    img_size_computed = true;
+                }
+                app->img_msg.header.seq = app->img_seq++;
+                app->img_msg.header.stamp = ros::Time::now();
+                if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
+                {
+                    //TODO: CONVERT TO RGB BEFORE MEMCPY
+                }
+                memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
+                app->img_pub.publish(app->img_msg);
+            }
         }
         pthread_mutex_lock(&(app->pose_mutex));
         app->map_to_odom.header.seq = app->map_to_odom_seq++;
@@ -204,6 +280,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   ctxt.pose_mutex_ptr = &pose_mutex;
   ctxt.odom_to_base_ptr = &odom_to_base;
   ctxt.nh = new ros::NodeHandle(NAMESPACE);
+  ctxt.image_manager_ready = false;
   tf_bcaster = new tf2_ros::TransformBroadcaster;
   static_tf_bcaster = new tf2_ros::StaticTransformBroadcaster;
   tf_buffer = new tf2_ros::Buffer;
@@ -240,6 +317,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   base_to_color.header.frame_id = TANGO_PREFIX"tango_base_link";
   base_to_color.child_frame_id = TANGO_PREFIX"tango_camera_color";
   pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
+  img_pub = (ctxt.nh)->advertise<sensor_msgs::Image>("tango_image_color", 1);
   known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
   int version = 0;
   TangoErrorType err = TangoSupport_GetTangoVersion(env, caller_activity, &version);
@@ -347,6 +425,14 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
     LOGE( "Failed to connect to point cloud callback with error code: %d", err);
     std::exit(EXIT_SUCCESS);
   }
+
+  err = TangoConfig_setBool(tango_config_, "config_enable_color_camera", true);
+  if (err != TANGO_SUCCESS) {
+      LOGE( "Failed to enable color camera with error code: %d", err);
+      std::exit(EXIT_SUCCESS);
+  }
+
+  err = TangoService_connectOnFrameAvailable(TANGO_CAMERA_COLOR, (void*)&ctxt, onFrameAvailable);
 
   TangoCoordinateFramePair pair;
   pair.base = TANGO_COORDINATE_FRAME_START_OF_SERVICE;
