@@ -147,23 +147,26 @@ namespace tango_native_streaming {
 //TODO: Run ROS initialization on separate thread so Android does not complain
 void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   int seq = 0;
-  sensor_msgs::PointField x, y, z;
+  sensor_msgs::PointField x, y, z, c;
   x.name = "x";
   y.name = "y";
   z.name = "z";
+  c.name = "c";
   x.offset = 0;
   y.offset = sizeof(float);
   z.offset = 2.0*sizeof(float);
-  x.count = y.count = z.count = 1;
-  x.datatype = y.datatype = z.datatype = sensor_msgs::PointField::FLOAT32;
+  c.offset = 3.0*sizeof(float);
+  x.count = y.count = z.count = c.count = 1;
+  x.datatype = y.datatype = z.datatype = c.datatype = sensor_msgs::PointField::FLOAT32;
   pc_msg.header.frame_id = TANGO_PREFIX"tango_camera_depth";
   pc_msg.height = 1;
   pc_msg.is_bigendian = false;
   pc_msg.is_dense = true;
-  pc_msg.point_step = 3 * sizeof(float);
+  pc_msg.point_step = 4 * sizeof(float);
   pc_msg.fields.push_back(x);
   pc_msg.fields.push_back(y);
   pc_msg.fields.push_back(z);
+  pc_msg.fields.push_back(c);
   tango_config_ = TangoService_getConfig(TANGO_CONFIG_DEFAULT);
   pthread_mutex_init(&pose_mutex, NULL);
   int32_t max_point_cloud_elements;
@@ -319,10 +322,29 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
 
   err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
   if (err != TANGO_SUCCESS) {
-    LOGE(
-        "TangoNativeStreamingApp::OnTangoServiceConnected,"
-        "Failed to connect to point cloud callback with error code: %d",
-        err);
+    LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
+    std::exit(EXIT_SUCCESS);
+  }
+
+
+  int32_t max_point_cloud_elements;
+  int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
+                                         &max_point_cloud_elements);
+  if(ret != TANGO_SUCCESS) {
+    LOGE("Failed to query maximum number of point cloud elements, with error %d", ret);
+  }
+  else
+  {
+    LOGI("Max Point Cloud elements = %d", max_point_cloud_elements);
+  }
+  ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
+  if(ret != TANGO_SUCCESS) {
+      LOGE("Failed to create support point cloud manager");
+  }
+
+  err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
+  if (err != TANGO_SUCCESS) {
+    LOGE( "Failed to connect to point cloud callback with error code: %d", err);
     std::exit(EXIT_SUCCESS);
   }
 
