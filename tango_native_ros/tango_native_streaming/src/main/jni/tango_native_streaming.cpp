@@ -66,10 +66,14 @@ void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   int ret;
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
   ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
-  if (ret != TANGO_SUCCESS)
+  /*if (ret != TANGO_SUCCESS)
   {
     LOGE("ERROR UPDATING TANGO MANAGER");
   }
+  else
+  {
+    LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
+  }*/
 }
 
 void onPoseAvailable(void* context, const TangoPoseData *pose) {
@@ -100,9 +104,7 @@ void* pub_thread_method(void* arg)
         if (app == NULL)
             LOGE("APP IS NULL");
         if ((app->ctxt).pc_manager == NULL)
-            LOGE("pc_manager IS NULL");
-        else
-            LOGI("PC Manager address = %d", &((app->ctxt).pc_manager));
+            LOGE("pc_manager IS NULL");;
         ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
         if (ret != TANGO_SUCCESS)
         {
@@ -307,6 +309,13 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
         err);
     std::exit(EXIT_SUCCESS);
   }
+
+  err = TangoConfig_setInt32(tango_config_, "config_depth_mode", TANGO_POINTCLOUD_XYZC);
+    if (err != TANGO_SUCCESS) {
+      LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
+      std::exit(EXIT_SUCCESS);
+    }
+
 
   err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
   if (err != TANGO_SUCCESS) {
