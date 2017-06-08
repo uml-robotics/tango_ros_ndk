@@ -49,6 +49,7 @@
 #include <sensor_msgs/PointField.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <jni.h>
 
 #define LOG_TAG "tango_native_streaming"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
