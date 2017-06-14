@@ -41,12 +41,16 @@
 
 #include <endian.h>
 
+#include <GLES3/gl3.h>
+
+#include <GLES3/gl3ext.h>
+
 //TODO: Set these through Java UI instead
 //set to ROS_MASTER uri (including http:// and port)
-#define ROS_MASTER "http://10.185.0.145:11311"
+#define ROS_MASTER "http://10.0.7.104:11311"
 
 //set to Tango's IP
-#define ROS_IP "10.185.0.249"
+#define ROS_IP "10.0.7.126"
 
 //optional, prefixes tf names with it, must either be empty, or end in a forward slash /
 #define TANGO_PREFIX "tango_brain_0/"
@@ -179,6 +183,63 @@ void* pub_thread_method(void* arg)
                 if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
                 {
                     //TODO: CONVERT TO RGB BEFORE MEMCPY
+                    //draw the texture into a buffer then read it back for free conversion?
+
+                GLuint frame_buffer;
+                GLuint color_texture;
+
+                //If I change this to GLGenFrameBuffers(); then it brings me to gl3.h
+                glGenFramebuffers(1, &(frame_buffer));
+
+                glGenTextures(1, &(color_texture) );
+                glBindTexture(GL_TEXTURE_2D, color_texture);
+
+                //First RGB needs to change? changed BYTE to INT
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_ptr->width, img_ptr->height, 0, GL_RGB, GL_UNSIGNED_INT, &(img_ptr->data[0]));
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+                glBindTexture(GL_TEXTURE_2D, 0); //might not be needed
+
+                glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_texture, 0);
+
+                if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE )
+                {
+                    glReadPixels(0,0,img_ptr->width,img_ptr->height,GL_RGB,GL_UNSIGNED_INT,&(img_ptr->data[0]));
+                }
+                else{
+                LOGI("ERROR WITH FRAME BUFFER CREATION");
+                }
+
+                //render buffer needed?
+
+                glDeleteBuffers(1, &(frame_buffer));
+                glDeleteTextures(1, &(color_texture));
+
+                    //Old produces a pink and green image
+                    /*int index;
+                    uint8_t r,g,b;
+
+                    for(index = 0; index < size/3; index = index + 3)
+                    {
+
+                     int rTmp = img_ptr->data[index] + (1.370705 * (img_ptr->data[index + 2]-128));
+                     int gTmp = img_ptr->data[index] - (0.698001 * (img_ptr->data[index + 2]-128)) - (0.337633 * (img_ptr->data[index + 1]-128));
+                     int bTmp = img_ptr->data[index] + (1.732446 * (img_ptr->data[index + 1]-128));
+                     r = std::min(std::max(rTmp, 0), 255);
+                     g = std::min(std::max(gTmp, 0), 255);
+                     b = std::min(std::max(bTmp, 0), 255);
+
+
+                     img_ptr->data[index] = r;
+                     img_ptr->data[index + 1] = g;
+                     img_ptr->data[index + 2] = b;
+                   }*/
                 }
                 memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
                 app->img_pub.publish(app->img_msg);
