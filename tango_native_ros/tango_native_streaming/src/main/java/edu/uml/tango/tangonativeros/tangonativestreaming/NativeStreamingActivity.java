@@ -60,6 +60,9 @@ import android.os.IBinder;
  * hooking to the android lifecycle events to native code code which calls into Tango C API.
  */
 public class NativeStreamingActivity extends Activity {
+
+    public static String ros_master_jstr = "http://10.0.7.172:11311", ros_ip_jstr = "10.0.7.220", tango_prefix_jstr = "tango_brain_0/", namespace_jstr = "tango_brain_0";
+
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder service) {
