@@ -55,6 +55,11 @@ else
     LOCAL_SRC_FILES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/lib_tango_support_api/lib/armeabi-v7a/libtango_support_api.so
     LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/lib_tango_support_api/include
 endif
+
+ifeq ($(TARGET_ARCH), arm)
+	LOCAL_SRC_FILES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/lib_tango_support_api/lib/armeabi-v7a/libtango_support_api.so
+endif
+
 include $(PREBUILT_SHARED_LIBRARY)
 
 $(call import-add-path,$(PROJECT_ROOT))

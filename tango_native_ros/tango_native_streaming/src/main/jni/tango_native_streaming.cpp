@@ -33,6 +33,8 @@
 
 #include <cstdlib>
 
+#include <jni.h>
+
 #include <tango_support_api.h>
 
 #include "tango_native_streaming/tango_native_streaming.h"
@@ -99,13 +101,75 @@ void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *b
     }
   }
 }
+ void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
 
-void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
+           int frameSize = width * height;
+
+            int ii = 0;
+            int ij = 0;
+            int di = +1;
+            int dj = +1;
+
+           int a = 0;
+           for (int i = 0, ci = ii; i < height; ++i, ci += di) {
+               for (int j = 0, cj = ij; j < width; ++j, cj += dj) {
+                   int y = (0xff & ((int) yuv420sp[ci * width + cj]));
+                   int v = (0xff & ((int) yuv420sp[frameSize + (ci >> 1) * width + (cj & ~1) + 0]));
+                   int u = (0xff & ((int) yuv420sp[frameSize + (ci >> 1) * width + (cj & ~1) + 1]));
+                   y = y < 16 ? 16 : y;
+
+                   int r = (int) (1.164f * (y - 16) + 1.596f * (v - 128));
+                   int g = (int) (1.164f * (y - 16) - 0.813f * (v - 128) - 0.391f * (u - 128));
+                   int b = (int) (1.164f * (y - 16) + 2.018f * (u - 128));
+
+                   r = r < 0 ? 0 : (r > 255 ? 255 : r);
+                   g = g < 0 ? 0 : (g > 255 ? 255 : g);
+                   b = b < 0 ? 0 : (b > 255 ? 255 : b);
+
+                   rgb[a] = r;
+                   a = a + 1;
+                   rgb[a] = g;
+                   a = a + 1;
+                   rgb[a] = b;
+                   a = a + 1;
+               }
+           }
+
+       /*  int frameSize = width * height;
+
+        for (int j = 0, yp = 0; j < height; j++) {
+        int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
+        for (int i = 0; i < width; i++, yp++) {
+            int y = (0xff & ((int) yuv420sp[yp])) - 16;
+            if (y < 0) y = 0;
+            if ((i & 1) == 0) {
+                v = (0xff & yuv420sp[uvp++]) - 128;
+                u = (0xff & yuv420sp[uvp++]) - 128;
+            }
+
+            int y1192 = 1192 * y;
+            int r = (y1192 + 1634 * v);
+            int g = (y1192 - 833 * v - 400 * u);
+            int b = (y1192 + 2066 * u);
+
+            if (r < 0) r = 0; else if (r > 262143) r = 262143;
+            if (g < 0) g = 0; else if (g > 262143) g = 262143;
+            if (b < 0) b = 0; else if (b > 262143) b = 262143;
+
+            rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+        }
+    }*/
+    }
+  void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
   int ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
   if (ret != TANGO_SUCCESS)
   {
     LOGE("ERROR UPDATING TANGO MANAGER");
+  }
+  else
+  {
+    LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
   }
 }
 
@@ -137,10 +201,14 @@ void* pub_thread_method(void* arg)
     int size;
     while (ros::ok())
     {
+        if (app == NULL)
+            LOGE("APP IS NULL");
+        if ((app->ctxt).pc_manager == NULL)
+            LOGE("pc_manager IS NULL");;
         ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
         if (ret != TANGO_SUCCESS)
         {
-            LOGE("Error retrieving latest pointcloud");
+            LOGE("Error %d retrieving latest pointcloud", ret);
         }
         if (new_available)
         {
@@ -183,18 +251,23 @@ void* pub_thread_method(void* arg)
                 if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
                 {
                     //TODO: CONVERT TO RGB BEFORE MEMCPY
+
                     //draw the texture into a buffer then read it back for free conversion?
 
-                GLuint frame_buffer;
+                    //shaders
+
+                /*GLuint frame_buffer;
+                GLuint color_buffer;
                 GLuint color_texture;
 
-                //If I change this to GLGenFrameBuffers(); then it brings me to gl3.h
                 glGenFramebuffers(1, &(frame_buffer));
+                glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+                LOGI("Status: %d",glCheckFramebufferStatus(GL_FRAMEBUFFER));
+                LOGI("Error: %d",glGetError());
 
                 glGenTextures(1, &(color_texture) );
                 glBindTexture(GL_TEXTURE_2D, color_texture);
 
-                //First RGB needs to change? changed BYTE to INT
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_ptr->width, img_ptr->height, 0, GL_RGB, GL_UNSIGNED_INT, &(img_ptr->data[0]));
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -202,35 +275,47 @@ void* pub_thread_method(void* arg)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-                glBindTexture(GL_TEXTURE_2D, 0); //might not be needed
-
-                glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+                glBindTexture(GL_TEXTURE_2D, 0); //unbind texture if needed
 
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_texture, 0);
 
-                if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE )
-                {
-                    glReadPixels(0,0,img_ptr->width,img_ptr->height,GL_RGB,GL_UNSIGNED_INT,&(img_ptr->data[0]));
-                }
-                else{
-                LOGI("ERROR WITH FRAME BUFFER CREATION");
-                }
+                glGenRenderbuffers(1, &color_buffer);
+                glBindRenderbuffer(GL_RENDERBUFFER, color_buffer);
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, img_ptr->width, img_ptr->height);
+                glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-                //render buffer needed?
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color_buffer);
+
+                glReadPixels(0,0,img_ptr->width,img_ptr->height,GL_RGB,GL_UNSIGNED_INT,&app->img_msg.data[0]);
 
                 glDeleteBuffers(1, &(frame_buffer));
+                glDeleteBuffers(1, &(color_buffer));
                 glDeleteTextures(1, &(color_texture));
+*/
+                decodeYUV420SP(&app->img_msg.data[0], &img_ptr->data[0], img_ptr->width, img_ptr->height);
+
 
                     //Old produces a pink and green image
-                    /*int index;
+/*                    int index;
                     uint8_t r,g,b;
 
-                    for(index = 0; index < size/3; index = index + 3)
+                    for(index = 0; index < img_ptr->height * img_ptr->width; index = index + 3)
                     {
+                    //LOGI("INDEX : %d", index);
+                    /*
+                    //blue and red image
+                    img_ptr->data[index]=1.1643*(img_ptr->data[index]-0.0625);
+                    img_ptr->data[index + 1]=img_ptr->data[index + 1]-0.5;
+                    img_ptr->data[index + 2]=img_ptr->data[index + 2]-0.5;
 
-                     int rTmp = img_ptr->data[index] + (1.370705 * (img_ptr->data[index + 2]-128));
-                     int gTmp = img_ptr->data[index] - (0.698001 * (img_ptr->data[index + 2]-128)) - (0.337633 * (img_ptr->data[index + 1]-128));
-                     int bTmp = img_ptr->data[index] + (1.732446 * (img_ptr->data[index + 1]-128));
+                    r=img_ptr->data[index]+1.5958*img_ptr->data[index + 2];
+                    g=img_ptr->data[index]-0.39173*img_ptr->data[index + 1]-0.81290*img_ptr->data[index + 2];
+                    b=img_ptr->data[index]+2.017*img_ptr->data[index + 1];
+                    */
+/*
+                     int rTmp = img_ptr->data[index] + (1.370705 * (img_ptr->data[index + 1]-128));
+                     int gTmp = img_ptr->data[index] - (0.698001 * (img_ptr->data[index + 1]-128)) - (0.337633 * (img_ptr->data[index + 2]-128));
+                     int bTmp = img_ptr->data[index] + (1.732446 * (img_ptr->data[index + 2]-128));
                      r = std::min(std::max(rTmp, 0), 255);
                      g = std::min(std::max(gTmp, 0), 255);
                      b = std::min(std::max(bTmp, 0), 255);
@@ -241,7 +326,7 @@ void* pub_thread_method(void* arg)
                      img_ptr->data[index + 2] = b;
                    }*/
                 }
-                memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
+                //memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
                 app->img_pub.publish(app->img_msg);
             }
         }

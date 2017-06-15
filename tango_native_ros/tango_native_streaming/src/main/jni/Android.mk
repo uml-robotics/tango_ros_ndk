@@ -16,7 +16,9 @@ LOCAL_CFLAGS    := -std=c++11
 LOCAL_SRC_FILES := jni_interface.cpp \
                    tango_native_streaming.cpp
 
-LOCAL_LDLIBS    := -llog -L$(SYSROOT)/usr/lib
+LOCAL_LDLIBS    := -llog -L$(SYSROOT)/usr/lib \
+                   -lGLESv2 -ldl -llog
+
 LOCAL_STATIC_LIBRARIES := roscpp_android_ndk
 include $(BUILD_SHARED_LIBRARY)
 
