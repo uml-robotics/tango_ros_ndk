@@ -41,23 +41,6 @@
 
 #include <tf/transform_datatypes.h>
 
-//TODO: Set these through Java UI instead
-//set to ROS_MASTER uri (including http:// and port)
-//#define ROS_MASTER "http://10.0.7.172:11311"
-
-//set to Tango's IP
-//#define ROS_IP "10.0.7.220"
-
-//optional, prefixes tf names with it, must either be empty, or end in a forward slash /
-//#define TANGO_PREFIX "tango_brain_0/"
-
-//namespace for the node, also used as node name, required
-//#define NAMESPACE "tango_brain_0"
-
-/*char *ROS_MASTER = "http://10.0.7.172:11311",
-     *ROS_IP = "10.0.7.220",
-     *TANGO_PREFIX = "tango_brain_0/",
-     *NAMESPACE = "tango_brain_0";*/
 char *ROS_MASTER_URI_PREFIX = "__master:=",
      *ROS_IP_URI_PREFIX = "__ip:=",
      *TANGO_CAMERA_DEPTH_SUFFIX = "tango_camera_depth",
@@ -163,7 +146,6 @@ namespace tango_native_streaming {
 //TODO: Run ROS initialization on separate thread so Android does not complain
 void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
 
-   //jclass thisClass = (*env).FindClass("edu/uml/tango/tangonativeros/tangonativestreaming/NativeStreamingActivity");
    jclass thisClass = (*env).GetObjectClass(caller_activity);
 
    jfieldID fidMaster = (*env).GetStaticFieldID(thisClass, "ros_master_jstr", "Ljava/lang/String;"),
@@ -185,25 +167,15 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
 
    char ros_master[64], ros_ip[64], tango_prefix[64], tango_namespace[64];
 
-//   std::size_t length1 = std::string(in_ros_master).copy(ros_master,0,std::string(in_ros_master).length());
-//   ros_master[length1]='\0';
    strcpy(ros_master, in_ros_master);
-//   LOGI("ros_master before release: %s", ros_master);
    env->ReleaseStringUTFChars(js_ros_master, in_ros_master);
-//   LOGI("ros_master after release: %s", ros_master);
 
-//   std::size_t length2 = std::string(in_ros_ip).copy(ros_ip,0,std::string(in_ros_ip).length());
-//   ros_ip[length2]='\0';
    strcpy(ros_ip, in_ros_ip);
    env->ReleaseStringUTFChars(js_ros_ip, in_ros_ip);
 
-//   std::size_t length3 = std::string(in_tango_prefix).copy(tango_prefix,0,std::string(in_tango_prefix).length());
-//   tango_prefix[length3]='\0';
    strcpy(tango_prefix, in_tango_prefix);
    env->ReleaseStringUTFChars(js_tango_prefix, in_tango_prefix);
 
-//   std::size_t length4 = std::string(in_tango_namespace).copy(tango_namespace,0,std::string(in_tango_namespace).length());
-//   ros_namespace[length4]='\0';
    strcpy(tango_namespace, in_tango_namespace);
    env->ReleaseStringUTFChars(js_tango_namespace, in_tango_namespace);
 
