@@ -61,6 +61,8 @@ char ros_master[256],
      tango_base_link[256],
      tango_pose[256];
 
+     bool running = false;
+
 namespace {
 
 // The minimum Tango Core version required from this application.
@@ -106,7 +108,8 @@ void* pub_thread_method(void* arg)
     TangoErrorType ret;
     TangoPointCloud* pc_ptr;
     bool new_available;
-    while (ros::ok())
+    running = true;
+    while (running)
     {
         if (app == NULL)
             LOGE("APP IS NULL");
@@ -284,12 +287,16 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
 }
 
 void TangoNativeStreamingApp::OnPause() {
+  LOGI("Shutting down ros");
+  running = false;
+  LOGI("Stopping pub_thread");
+  pthread_join(pub_thread, NULL);
+  LOGI("pub_thread stopped");
+  ros::shutdown();
+  LOGI("ros stopped");
   TangoConfig_free(tango_config_);
   tango_config_ = nullptr;
   TangoService_disconnect();
-  LOGI("Shutting down ros");
-  ros::shutdown();
-  pthread_join(pub_thread, NULL);
   LOGI("Done");
 }
 
