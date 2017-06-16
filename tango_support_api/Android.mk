@@ -48,6 +48,7 @@ PROJECT_ROOT:= $(LOCAL_PATH)/..
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := tango_support_api
+
 ifeq ($(TARGET_ARCH),x86)
     LOCAL_SRC_FILES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/lib_tango_support_api/lib/x86/libtango_support_api.so
     LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)/EXTRACT_TANGO_SUPPORT_LIBRARY_HERE/lib_tango_support_api/include

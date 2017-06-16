@@ -2,12 +2,10 @@
 /.emacs.desktop
 /.emacs.desktop.lock
 *~
-<<<<<<< HEAD
 *.iws
 workspace.xml
 tasks.xml
-=======
-#built application files
+## Built application files
 *.apk
 *.ap_
 
@@ -43,4 +41,3 @@ build/
 
 #NDK
 obj/
->>>>>>> 0dcfc16ca0ef11ae749c4d08629080a978db6e9f

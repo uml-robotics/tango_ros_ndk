@@ -168,6 +168,7 @@ void* pub_thread_method(void* arg)
     TangoErrorType ret;
     TangoPointCloud* pc_ptr;
     TangoImageBuffer* img_ptr;
+
     bool new_available;
     bool img_size_computed = false;
     int size;
@@ -248,6 +249,57 @@ namespace tango_native_streaming {
 
 //TODO: Run ROS initialization on separate thread so Android does not complain
 void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
+
+   jclass thisClass = (*env).GetObjectClass(caller_activity);
+
+   jfieldID fidMaster = (*env).GetStaticFieldID(thisClass, "ros_master_jstr", "Ljava/lang/String;"),
+            fidRosIp = (*env).GetStaticFieldID(thisClass, "ros_ip_jstr", "Ljava/lang/String;"),
+            fidPrefix = (*env).GetStaticFieldID(thisClass, "tango_prefix_jstr", "Ljava/lang/String;"),
+            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;");
+
+   jstring js_ros_master = (jstring)env->GetStaticObjectField(thisClass, fidMaster),
+           js_ros_ip = (jstring)env->GetStaticObjectField(thisClass, fidRosIp),
+           js_tango_prefix = (jstring)env->GetStaticObjectField(thisClass, fidPrefix),
+           js_tango_namespace = (jstring)env->GetStaticObjectField(thisClass, fidNamespace);
+
+   const char *in_ros_master = env->GetStringUTFChars(js_ros_master, NULL),
+              *in_ros_ip = env->GetStringUTFChars(js_ros_ip, NULL),
+              *in_tango_prefix = env->GetStringUTFChars(js_tango_prefix, NULL),
+              *in_tango_namespace = env->GetStringUTFChars(js_tango_namespace, NULL);
+
+   LOGI("in_ros_master: %s", in_ros_master);
+
+   char ros_master[64], ros_ip[64], tango_prefix[64], tango_namespace[64];
+
+   strcpy(ros_master, in_ros_master);
+   env->ReleaseStringUTFChars(js_ros_master, in_ros_master);
+
+   strcpy(ros_ip, in_ros_ip);
+   env->ReleaseStringUTFChars(js_ros_ip, in_ros_ip);
+
+   strcpy(tango_prefix, in_tango_prefix);
+   env->ReleaseStringUTFChars(js_tango_prefix, in_tango_prefix);
+
+   strcpy(tango_namespace, in_tango_namespace);
+   env->ReleaseStringUTFChars(js_tango_namespace, in_tango_namespace);
+
+   strcpy(ros_master_uri, ROS_MASTER_URI_PREFIX);
+   strcat(ros_master_uri, ros_master);
+   strcpy(ros_ip_uri, ROS_IP_URI_PREFIX);
+   strcat(ros_ip_uri, ros_ip);
+   strcpy(tango_camera_depth, tango_prefix);
+   strcat(tango_camera_depth, TANGO_CAMERA_DEPTH_SUFFIX);
+   strcpy(tango_camera_color, tango_prefix);
+   strcat(tango_camera_color, TANGO_CAMERA_COLOR_SUFFIX);
+   strcpy(tango_odom, tango_prefix);
+   strcat(tango_odom, TANGO_ODOM_SUFFIX);
+   strcpy(tango_base_link, tango_prefix);
+   strcat(tango_base_link, TANGO_BASE_LINK_SUFFIX);
+   strcpy(tango_pose, tango_prefix);
+   strcat(tango_pose, TANGO_POSE_SUFFIX);
+
+   LOGI("ros_master_uri: %s", ros_master_uri);
+
   int seq = 0;
   sensor_msgs::PointField x, y, z, c;
   x.name = "x";
@@ -273,7 +325,6 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   pthread_mutex_init(&pose_mutex, NULL);
   int ret;
 
-
   int argc = 3;
   char *argv[] = {(char*)"nothing_important" , (char*)"__master:=" ROS_MASTER, (char*)"__ip:=" ROS_IP};
   LOGI("GOING TO ROS INIT");
@@ -281,7 +332,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   for(int i = 0; i < argc; i++){
       LOGI("%s", argv[i]);
   }
-  ros::init(argc, &argv[0], NAMESPACE);
+  ros::init(argc, &argv[0], ros_namespace);
 
   LOGI("GOING TO NODEHANDLE");
 
@@ -303,7 +354,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   tf_buffer = new tf2_ros::Buffer;
   tf_listener = new tf2_ros::TransformListener(*tf_buffer);
   map_to_odom.header.frame_id = "map";
-  map_to_odom.child_frame_id = TANGO_PREFIX"odom";
+  map_to_odom.child_frame_id = tango_odom;
   map_to_odom.transform.translation.x = 0;
   map_to_odom.transform.translation.y = 0;
   map_to_odom.transform.translation.z = 0;
@@ -311,8 +362,8 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   map_to_odom.transform.rotation.y = 0;
   map_to_odom.transform.rotation.z = 0;
   map_to_odom.transform.rotation.w = 1;
-  odom_to_base.header.frame_id = TANGO_PREFIX"odom";
-  odom_to_base.child_frame_id = TANGO_PREFIX"tango_base_link";
+  odom_to_base.header.frame_id = tango_odom;
+  odom_to_base.child_frame_id = tango_base_link;
   odom_to_base.transform.translation.x = 0;
   odom_to_base.transform.translation.y = 0;
   odom_to_base.transform.translation.z = 0;
@@ -320,8 +371,8 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   odom_to_base.transform.rotation.y = 0;
   odom_to_base.transform.rotation.z = 0;
   odom_to_base.transform.rotation.w = 1;
-  base_to_pose.header.frame_id = TANGO_PREFIX"tango_base_link";
-  base_to_pose.child_frame_id = TANGO_PREFIX"tango_pose";
+  base_to_pose.header.frame_id = tango_base_link;
+  base_to_pose.child_frame_id = tango_pose;
   base_to_pose.transform.translation.x = 0;
   base_to_pose.transform.translation.y = 0;
   base_to_pose.transform.translation.z = 0;
@@ -329,10 +380,10 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   base_to_pose.transform.rotation.y = 0.5;
   base_to_pose.transform.rotation.z = 0.5;
   base_to_pose.transform.rotation.w = 0.5;
-  base_to_depth.header.frame_id = TANGO_PREFIX"tango_base_link";
-  base_to_depth.child_frame_id = TANGO_PREFIX"tango_camera_depth";
-  base_to_color.header.frame_id = TANGO_PREFIX"tango_base_link";
-  base_to_color.child_frame_id = TANGO_PREFIX"tango_camera_color";
+  base_to_depth.header.frame_id = tango_base_link;
+  base_to_depth.child_frame_id = tango_camera_depth;
+  base_to_color.header.frame_id = tango_base_link;
+  base_to_color.child_frame_id = tango_camera_color;
   pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
   img_pub = (ctxt.nh)->advertise<sensor_msgs::Image>("tango_image_color", 1);
   known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
@@ -352,7 +403,7 @@ void TangoNativeStreamingApp::SetCurrentPoseCallback(const geometry_msgs::PoseWi
   bool tf_success = true;
   geometry_msgs::TransformStamped odom_to_pose_tf;
   try{
-    odom_to_pose_tf = tf_buffer->lookupTransform(TANGO_PREFIX"odom", TANGO_PREFIX"tango_pose",ros::Time(0));
+    odom_to_pose_tf = tf_buffer->lookupTransform(tango_odom, tango_pose,ros::Time(0));
   }
   catch (tf2::TransformException &ex) {
     LOGE("Could not get tf from odom to tango_pose, not setting pose");

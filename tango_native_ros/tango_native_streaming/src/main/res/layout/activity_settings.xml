@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/ROS_MASTER_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ROS_MASTER_LBL" />
+
+        <EditText
+            android:id="@+id/MASTER_IP_EDIT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/ROS_NODE_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ROS_NODE_LBL" />
+
+        <EditText
+            android:id="@+id/NODE_IP_EDIT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/ROS_PREFIX_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ROS_PREFIX_LBL" />
+
+        <EditText
+            android:id="@+id/PREFIX_EDIT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/ROS_NAMESPACE_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ROS_NAMESPACE_LBL" />
+
+        <EditText
+            android:id="@+id/NAMESPACE_EDIT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <Button
+            android:id="@+id/START_BTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startStreaming"
+            android:text="@string/START_BTN" />
+    </TableRow>
+</TableLayout>
