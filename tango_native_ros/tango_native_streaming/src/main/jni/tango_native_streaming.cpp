@@ -43,19 +43,25 @@
 
 #include <endian.h>
 
+char *ROS_MASTER_URI_PREFIX = "__master:=",
+     *ROS_IP_URI_PREFIX = "__ip:=",
+     *TANGO_CAMERA_DEPTH_SUFFIX = "tango_camera_depth",
+     *TANGO_CAMERA_COLOR_SUFFIX = "tango_camera_color",
+     *TANGO_ODOM_SUFFIX = "odom",
+     *TANGO_BASE_LINK_SUFFIX = "tango_base_link",
+     *TANGO_POSE_SUFFIX = "tango_pose";
 
-//TODO: Set these through Java UI instead
-//set to ROS_MASTER uri (including http:// and port)
-#define ROS_MASTER "http://10.0.7.104:11311"
-
-//set to Tango's IP
-#define ROS_IP "10.0.7.126"
-
-//optional, prefixes tf names with it, must either be empty, or end in a forward slash /
-#define TANGO_PREFIX "tango_brain_0/"
-
-//namespace for the node, also used as node name, required
-#define NAMESPACE "tango_brain_0"
+char ros_master[256],
+     ros_ip[256],
+     tango_prefix[256],
+     ros_namespace[256],
+     ros_master_uri[256],
+     ros_ip_uri[256],
+     tango_camera_depth[256],
+     tango_camera_color[256],
+     tango_odom[256],
+     tango_base_link[256],
+     tango_pose[256];
 
 namespace {
 
@@ -70,7 +76,7 @@ void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *b
     if (!ctxt->image_manager_ready)
     {
       LOGI("Setting up Image Message, received image format is %d", buffer->format);
-      ctxt->img_msg_ptr->header.frame_id = TANGO_PREFIX"tango_camera_color";
+      ctxt->img_msg_ptr->header.frame_id = tango_camera_color;
       ctxt->img_msg_ptr->height = buffer->height;
       ctxt->img_msg_ptr->width = buffer->width;
       switch (buffer->format)
@@ -98,7 +104,36 @@ void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *b
     }
   }
 }
- void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
+
+void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
+  tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
+  int ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
+  if (ret != TANGO_SUCCESS)
+  {
+    LOGE("ERROR UPDATING TANGO MANAGER");
+  }
+  else
+  {
+    LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
+  }
+}
+
+void onPoseAvailable(void* context, const TangoPoseData *pose) {
+  tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
+  if (pthread_mutex_trylock(ctxt->pose_mutex_ptr) == 0)
+  {
+    ctxt->odom_to_base_ptr->transform.translation.x = pose->translation[0];
+    ctxt->odom_to_base_ptr->transform.translation.y = pose->translation[1];
+    ctxt->odom_to_base_ptr->transform.translation.z = pose->translation[2];
+    ctxt->odom_to_base_ptr->transform.rotation.x = pose->orientation[0];
+    ctxt->odom_to_base_ptr->transform.rotation.y = pose->orientation[1];
+    ctxt->odom_to_base_ptr->transform.rotation.z = pose->orientation[2];
+    ctxt->odom_to_base_ptr->transform.rotation.w = pose->orientation[3];
+    pthread_mutex_unlock(ctxt->pose_mutex_ptr);
+  }
+}
+
+void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
 
   int frameSize = width * height;
 
@@ -132,33 +167,6 @@ void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *b
        }
   }
 }
-  void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
-  tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
-  int ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
-  if (ret != TANGO_SUCCESS)
-  {
-    LOGE("ERROR UPDATING TANGO MANAGER");
-  }
-  else
-  {
-    LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
-  }
-}
-
-void onPoseAvailable(void* context, const TangoPoseData *pose) {
-  tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
-  if (pthread_mutex_trylock(ctxt->pose_mutex_ptr) == 0)
-  {
-    ctxt->odom_to_base_ptr->transform.translation.x = pose->translation[0];
-    ctxt->odom_to_base_ptr->transform.translation.y = pose->translation[1];
-    ctxt->odom_to_base_ptr->transform.translation.z = pose->translation[2];
-    ctxt->odom_to_base_ptr->transform.rotation.x = pose->orientation[0];
-    ctxt->odom_to_base_ptr->transform.rotation.y = pose->orientation[1];
-    ctxt->odom_to_base_ptr->transform.rotation.z = pose->orientation[2];
-    ctxt->odom_to_base_ptr->transform.rotation.w = pose->orientation[3];
-    pthread_mutex_unlock(ctxt->pose_mutex_ptr);
-  }
-}
 
 void* pub_thread_method(void* arg)
 {
@@ -168,7 +176,6 @@ void* pub_thread_method(void* arg)
     TangoErrorType ret;
     TangoPointCloud* pc_ptr;
     TangoImageBuffer* img_ptr;
-
     bool new_available;
     bool img_size_computed = false;
     int size;
@@ -185,7 +192,6 @@ void* pub_thread_method(void* arg)
         }
         if (new_available)
         {
-            //LOGI("New Point Cloud Available!");
             app->pc_msg.width = app->pc_msg.row_step = pc_ptr->num_points;
             app->pc_msg.header.seq = app->seq++;
             app->pc_msg.header.stamp = ros::Time::now();
@@ -312,7 +318,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   c.offset = 3.0*sizeof(float);
   x.count = y.count = z.count = c.count = 1;
   x.datatype = y.datatype = z.datatype = c.datatype = sensor_msgs::PointField::FLOAT32;
-  pc_msg.header.frame_id = TANGO_PREFIX"tango_camera_depth";
+  pc_msg.header.frame_id = tango_camera_depth;
   pc_msg.height = 1;
   pc_msg.is_bigendian = false;
   pc_msg.is_dense = true;
@@ -323,10 +329,25 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   pc_msg.fields.push_back(c);
   tango_config_ = TangoService_getConfig(TANGO_CONFIG_DEFAULT);
   pthread_mutex_init(&pose_mutex, NULL);
-  int ret;
+ /* int32_t max_point_cloud_elements;
+  int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
+                                       &max_point_cloud_elements);
+  if(ret != TANGO_SUCCESS) {
+    LOGE("Failed to query maximum number of point cloud elements.");
+  }
 
+  ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
+  if(ret != TANGO_SUCCESS) {
+      LOGE("Failed to create support point cloud manager");
+  }
+  else
+  {
+      LOGI("Successfully created point cloud manager, with %d max point cloud elements", max_point_cloud_elements);
+      LOGI("PC Manager address = %d", &(ctxt.pc_manager));
+  }
+*/
   int argc = 3;
-  char *argv[] = {(char*)"nothing_important" , (char*)"__master:=" ROS_MASTER, (char*)"__ip:=" ROS_IP};
+  char *argv[] = {(char*)"nothing_important" , ros_master_uri, ros_ip_uri};
   LOGI("GOING TO ROS INIT");
 
   for(int i = 0; i < argc; i++){
@@ -347,7 +368,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   LOGI("%s", master_uri.c_str());
   ctxt.pose_mutex_ptr = &pose_mutex;
   ctxt.odom_to_base_ptr = &odom_to_base;
-  ctxt.nh = new ros::NodeHandle(NAMESPACE);
+  ctxt.nh = new ros::NodeHandle(tango_namespace);
   ctxt.image_manager_ready = false;
   tf_bcaster = new tf2_ros::TransformBroadcaster;
   static_tf_bcaster = new tf2_ros::StaticTransformBroadcaster;
@@ -464,7 +485,6 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
     LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
     std::exit(EXIT_SUCCESS);
   }
-
 
   int32_t max_point_cloud_elements;
   int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",

@@ -34,6 +34,7 @@ public class SettingsActivity extends Activity {
         if (!ros_ip.equals("")) {
             tango_addr.setText(ros_ip);
         } else {
+
             tango_addr.setText("tango_addr_error");
         }
 
