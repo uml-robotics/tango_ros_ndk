@@ -78,7 +78,11 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Setting content view of this activity.
+        Intent intent = getIntent();
+        ros_master_jstr = intent.getStringExtra("ROS_MASTER");
+        ros_ip_jstr = intent.getStringExtra("ROS_IP");
+        tango_prefix_jstr = intent.getStringExtra("TANGO_PREFIX");
+        namespace_jstr = intent.getStringExtra("NAMESPACE");
         setContentView(R.layout.activity_depth_perception);
         TangoJniNative.onCreate(this);
     }
