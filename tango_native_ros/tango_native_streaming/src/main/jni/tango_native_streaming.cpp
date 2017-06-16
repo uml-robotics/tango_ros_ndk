@@ -43,9 +43,6 @@
 
 #include <endian.h>
 
-#include <GLES3/gl3.h>
-
-#include <GLES3/gl3ext.h>
 
 //TODO: Set these through Java UI instead
 //set to ROS_MASTER uri (including http:// and port)
@@ -225,11 +222,10 @@ void* pub_thread_method(void* arg)
                 app->img_msg.header.stamp = ros::Time::now();
                 if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
                 {
-                    //TODO: memcpy app to img ptr? inefficient
-                    //Tablet gives errors some times memory leak?
+                //TODO: Use openGLES to make conversion faster
                 decodeYUV420SP(&app->img_msg.data[0], &img_ptr->data[0], img_ptr->width, img_ptr->height);
                 }
-                else{ //Will copy back the grey if no else
+                else{
                 memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
                 }
                 app->img_pub.publish(app->img_msg);
