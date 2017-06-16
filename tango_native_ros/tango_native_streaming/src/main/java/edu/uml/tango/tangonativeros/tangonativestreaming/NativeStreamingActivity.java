@@ -78,11 +78,18 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        ros_master_jstr = intent.getStringExtra("ROS_MASTER");
-        ros_ip_jstr = intent.getStringExtra("ROS_IP");
-        tango_prefix_jstr = intent.getStringExtra("TANGO_PREFIX");
-        namespace_jstr = intent.getStringExtra("NAMESPACE");
+        if (savedInstanceState != null) {
+            ros_master_jstr = savedInstanceState.getString("ROS_MASTER");
+            ros_ip_jstr = savedInstanceState.getString("ROS_IP");
+            tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX");
+            namespace_jstr = savedInstanceState.getString("NAMESPACE");
+        } else {
+            Intent intent = getIntent();
+            ros_master_jstr = intent.getStringExtra("ROS_MASTER");
+            ros_ip_jstr = intent.getStringExtra("ROS_IP");
+            tango_prefix_jstr = intent.getStringExtra("TANGO_PREFIX");
+            namespace_jstr = intent.getStringExtra("NAMESPACE");
+        }
         setContentView(R.layout.activity_depth_perception);
         TangoJniNative.onCreate(this);
     }
@@ -99,12 +106,32 @@ public class NativeStreamingActivity extends Activity {
             intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
         }
         bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
+        TangoJniNative.onResume(this);
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         TangoJniNative.onPause();
         unbindService(mTangoServiceConnection);
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString("ROS_MASTER", ros_master_jstr);
+        savedInstanceState.putString("ROS_IP", ros_ip_jstr);
+        savedInstanceState.putString("TANGO_PREFIX", tango_prefix_jstr);
+        savedInstanceState.putString("NAMESPACE", namespace_jstr);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ros_master_jstr = savedInstanceState.getString("ROS_MASTER");
+        ros_ip_jstr = savedInstanceState.getString("ROS_IP");
+        tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX");
+        namespace_jstr = savedInstanceState.getString("NAMESPACE");
     }
 }

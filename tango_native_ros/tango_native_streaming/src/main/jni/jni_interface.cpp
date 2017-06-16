@@ -69,6 +69,11 @@ JNIEXPORT void JNICALL
 Java_edu_uml_tango_tangonativeros_tangonativestreaming_TangoJniNative_onPause(JNIEnv*, jobject) {
   app.OnPause();
 }
+
+JNIEXPORT void JNICALL
+Java_edu_uml_tango_tangonativeros_tangonativestreaming_TangoJniNative_onResume(JNIEnv* env, jobject obj, jobject caller_activity) {
+  app.OnResume(env, caller_activity);
+}
 #ifdef __cplusplus
 }
 #endif

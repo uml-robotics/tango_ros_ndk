@@ -171,4 +171,9 @@ public class TangoJniNative {
      * Interfaces to native OnPause function.
      */
     public static native void onPause();
+
+    /**
+     * Interfaces to native OnResume function.
+     */
+    public static native void onResume(Activity callerActivity);
 }

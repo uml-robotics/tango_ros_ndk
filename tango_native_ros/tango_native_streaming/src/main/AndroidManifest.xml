@@ -28,7 +28,8 @@
         <activity
             android:label="@string/app_name_long"
             android:name=".NativeStreamingActivity"
-            android:screenOrientation="nosensor">
+            android:screenOrientation="nosensor"
+            android:noHistory="false">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
@@ -37,7 +38,8 @@
         <activity
             android:label="Tango Native ROS settings"
             android:name=".SettingsActivity"
-            android:screenOrientation="nosensor">
+            android:screenOrientation="nosensor"
+            android:noHistory="false">
             <intent-filter android:label="Tango Native ROS Settings">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

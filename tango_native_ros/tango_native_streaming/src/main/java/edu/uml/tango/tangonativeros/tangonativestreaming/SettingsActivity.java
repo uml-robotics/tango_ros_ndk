@@ -20,26 +20,37 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ros_ip = getIPAddress(true);
 
-        setContentView(R.layout.activity_settings);
-
-        ros_addr = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        tango_addr = (TextView) findViewById(R.id.NODE_IP_EDIT);
-        prefix = (TextView) findViewById(R.id.PREFIX_EDIT);
-        tango_namespace = (TextView) findViewById(R.id.NAMESPACE_EDIT);
-
-        ros_addr.setText(ros_master);
-
-        if (!ros_ip.equals("")) {
-            tango_addr.setText(ros_ip);
+        if (savedInstanceState != null) {
+            ros_master = savedInstanceState.getString("ROS_MASTER");
+            ros_ip = savedInstanceState.getString("ROS_IP");
+            tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
+            namespace = savedInstanceState.getString("NAMESPACE");
         } else {
-            tango_addr.setText("tango_addr_error");
+            ros_ip = getIPAddress(true);
+            setContentView(R.layout.activity_settings);
+            ros_addr = (TextView) findViewById(R.id.MASTER_IP_EDIT);
+            tango_addr = (TextView) findViewById(R.id.NODE_IP_EDIT);
+            prefix = (TextView) findViewById(R.id.PREFIX_EDIT);
+            tango_namespace = (TextView) findViewById(R.id.NAMESPACE_EDIT);
+            ros_addr.setText(ros_master);
+
+            if (!ros_ip.equals("")) {
+                tango_addr.setText(ros_ip);
+            } else {
+                tango_addr.setText("tango_addr_error");
+            }
+
+            prefix.setText(tango_prefix);
+
+            tango_namespace.setText(namespace);
+
         }
+    }
 
-        prefix.setText(tango_prefix);
-
-        tango_namespace.setText(namespace);
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public static String getIPAddress(boolean useIPv4) {

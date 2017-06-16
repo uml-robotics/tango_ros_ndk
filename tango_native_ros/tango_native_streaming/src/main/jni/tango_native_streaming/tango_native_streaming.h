@@ -109,6 +109,8 @@ class TangoNativeStreamingApp {
 
   void OnPause();
 
+  void OnResume(JNIEnv* env, jobject caller_activity);
+
   void SetCurrentPoseCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr&);
 
  private:
