@@ -114,7 +114,7 @@ void* pub_thread_method(void* arg)
         if (app == NULL)
             LOGE("APP IS NULL");
         if ((app->ctxt).pc_manager == NULL)
-            LOGE("pc_manager IS NULL");;
+            LOGE("pc_manager IS NULL");
         ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
         if (ret != TANGO_SUCCESS)
         {
