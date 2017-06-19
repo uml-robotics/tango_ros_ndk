@@ -263,6 +263,7 @@ void* pub_thread_method(void* arg)
                 if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
                 {
                 //TODO: Use openGLES to make conversion faster
+                //Does img_ptr->data[] need to be updated?
                 decodeYUV420SP(&app->img_msg.data[0], &img_ptr->data[0], img_ptr->width, img_ptr->height);
                 }
                 else{
@@ -520,15 +521,7 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
     LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
     std::exit(EXIT_SUCCESS);
   }
-
-
-  err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
-  if (err != TANGO_SUCCESS) {
-    LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
-    std::exit(EXIT_SUCCESS);
-  }
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
   int32_t max_point_cloud_elements;
   int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
                                          &max_point_cloud_elements);
@@ -543,7 +536,7 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
   if(ret != TANGO_SUCCESS) {
       LOGE("Failed to create support point cloud manager");
   }
-
+/////////////////////////////////////////////////////////////////////////////////////////////
   err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
   if (err != TANGO_SUCCESS) {
     LOGE( "Failed to connect to point cloud callback with error code: %d", err);
