@@ -3,6 +3,7 @@ package edu.uml.tango.tangonativeros.tangonativestreaming;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,8 +15,8 @@ import java.util.List;
 
 public class SettingsActivity extends Activity {
 
-    public static String ros_master = "10.0.7.172", master_prefix = "http://", master_port = ":11311", ros_ip = "", tango_prefix = "tango_brain_0/", namespace = "tango_brain_0";
-    public TextView ros_addr, tango_addr, prefix, tango_namespace;
+    public static String ros_master = "10.0.7.172", master_prefix = "http://", master_port = "11311", ros_ip = "", tango_prefix = "tango_brain_0/", namespace = "tango_brain_0";
+    public TextView ros_master_edit, ros_port_edit, tango_addr_edit, prefix_edit, tango_namespace_edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,27 +24,31 @@ public class SettingsActivity extends Activity {
 
         if (savedInstanceState != null) {
             ros_master = savedInstanceState.getString("ROS_MASTER");
+            master_port = savedInstanceState.getString("ROS_PORT");
             ros_ip = savedInstanceState.getString("ROS_IP");
             tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
             namespace = savedInstanceState.getString("NAMESPACE");
         } else {
             ros_ip = getIPAddress(true);
             setContentView(R.layout.activity_settings);
-            ros_addr = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-            tango_addr = (TextView) findViewById(R.id.NODE_IP_EDIT);
-            prefix = (TextView) findViewById(R.id.PREFIX_EDIT);
-            tango_namespace = (TextView) findViewById(R.id.NAMESPACE_EDIT);
-            ros_addr.setText(ros_master);
+            ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
+            ros_port_edit = (TextView) findViewById(R.id.MASTER_PORT_EDIT);
+            tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
+            prefix_edit = (TextView) findViewById(R.id.PREFIX_EDIT);
+            tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
+
+            ros_master_edit.setText(ros_master);
+            ros_port_edit.setText(master_port);
 
             if (!ros_ip.equals("")) {
-                tango_addr.setText(ros_ip);
+                tango_addr_edit.setText(ros_ip);
             } else {
-                tango_addr.setText("tango_addr_error");
+                tango_addr_edit.setText("tango_addr_error");
             }
 
-            prefix.setText(tango_prefix);
+            prefix_edit.setText(tango_prefix);
 
-            tango_namespace.setText(namespace);
+            tango_namespace_edit.setText(namespace);
 
         }
     }
@@ -81,15 +86,23 @@ public class SettingsActivity extends Activity {
     }
 
     public void startStreaming(View view) {
-        ros_master = ros_addr.getText().toString();
-        ros_ip = tango_addr.getText().toString();
-        tango_prefix = prefix.getText().toString();
-        namespace = tango_namespace.getText().toString();
+        ros_master = ros_master_edit.getText().toString();
+        master_port = ros_port_edit.getText().toString();
+        ros_ip = tango_addr_edit.getText().toString();
+        tango_prefix = prefix_edit.getText().toString();
+        namespace = tango_namespace_edit.getText().toString();
+        Log.d("ROS Master IP: ", ros_master);
+        Log.d("ROS port: ", master_port);
+        Log.d("Tango IP: ", ros_ip);
+        Log.d("Tango prefix: ", tango_prefix);
+        Log.d("Tango Namespace: ", namespace);
         Intent intent = new Intent(this, NativeStreamingActivity.class);
-        intent.putExtra("ROS_MASTER", master_prefix + ros_master + master_port);
+        intent.putExtra("ROS_MASTER", master_prefix + ros_master + ':' + master_port);
         intent.putExtra("ROS_IP", ros_ip);
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

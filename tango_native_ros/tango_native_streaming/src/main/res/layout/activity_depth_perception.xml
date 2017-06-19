@@ -17,6 +17,6 @@
         android:layout_weight="1"
         android:onClick="stopStreaming"
         android:text="@string/STOP_BTN"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 </LinearLayout>

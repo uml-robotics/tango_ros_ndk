@@ -54,6 +54,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 
+// TODO figure out why the app doesn't restore from recent apps when previous transition was from this activity to recent apps
+
 /**
  * The main activity of the hello depth perception example application.
  *
@@ -62,7 +64,7 @@ import android.view.View;
  */
 public class NativeStreamingActivity extends Activity {
 
-    public static String ros_master_jstr = "http://10.0.7.172:11311", ros_ip_jstr = "10.0.7.220", tango_prefix_jstr = "tango_brain_0/", namespace_jstr = "tango_brain_0";
+    public static String ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
 
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
@@ -97,6 +99,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     protected void onResume() {
+
         super.onResume();
 
         Intent intent = new Intent();
@@ -116,6 +119,12 @@ public class NativeStreamingActivity extends Activity {
         TangoJniNative.onPause();
         unbindService(mTangoServiceConnection);
         super.onPause();
+//        Intent i = getBaseContext().getPackageManager()
+//                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        startActivity(i);
+        finish();
+        System.exit(0);
     }
 
     @Override
