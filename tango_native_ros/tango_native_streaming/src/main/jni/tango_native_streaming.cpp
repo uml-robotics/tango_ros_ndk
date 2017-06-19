@@ -137,6 +137,7 @@ void onPoseAvailable(void* context, const TangoPoseData *pose) {
   }
 }
 
+//Taken from stackoverflow: https://stackoverflow.com/questions/12469730/confusion-on-yuv-nv21-conversion-to-rgb
 void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
 
   int frameSize = width * height;
@@ -262,12 +263,11 @@ void* pub_thread_method(void* arg)
                 app->img_msg.header.stamp = ros::Time::now();
                 if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
                 {
-                //TODO: Use openGLES to make conversion faster?
-                //Does img_ptr->data[] need to be updated?
-                decodeYUV420SP(&app->img_msg.data[0], &img_ptr->data[0], img_ptr->width, img_ptr->height);
+                    //TODO: Use openGLES to make conversion faster?
+                    decodeYUV420SP(&app->img_msg.data[0], &img_ptr->data[0], img_ptr->width, img_ptr->height);
                 }
                 else{
-                memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
+                    memcpy(&app->img_msg.data[0], (void*)img_ptr->data, size);
                 }
                 app->img_pub.publish(app->img_msg);
             }
@@ -365,23 +365,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
   pc_msg.fields.push_back(c);
   tango_config_ = TangoService_getConfig(TANGO_CONFIG_DEFAULT);
   pthread_mutex_init(&pose_mutex, NULL);
- /* int32_t max_point_cloud_elements;
-  int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
-                                       &max_point_cloud_elements);
-  if(ret != TANGO_SUCCESS) {
-    LOGE("Failed to query maximum number of point cloud elements.");
-  }
 
-  ret = TangoSupport_createPointCloudManager(max_point_cloud_elements, &(ctxt.pc_manager));
-  if(ret != TANGO_SUCCESS) {
-      LOGE("Failed to create support point cloud manager");
-  }
-  else
-  {
-      LOGI("Successfully created point cloud manager, with %d max point cloud elements", max_point_cloud_elements);
-      LOGI("PC Manager address = %d", &(ctxt.pc_manager));
-  }
-*/
   int argc = 3;
   char *argv[] = {(char*)"nothing_important" , ros_master_uri, ros_ip_uri};
   LOGI("GOING TO ROS INIT");
@@ -521,7 +505,7 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
     LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
     std::exit(EXIT_SUCCESS);
   }
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
   int32_t max_point_cloud_elements;
   int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
                                          &max_point_cloud_elements);
@@ -536,7 +520,7 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
   if(ret != TANGO_SUCCESS) {
       LOGE("Failed to create support point cloud manager");
   }
-/////////////////////////////////////////////////////////////////////////////////////////////
+
   err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
   if (err != TANGO_SUCCESS) {
     LOGE( "Failed to connect to point cloud callback with error code: %d", err);
