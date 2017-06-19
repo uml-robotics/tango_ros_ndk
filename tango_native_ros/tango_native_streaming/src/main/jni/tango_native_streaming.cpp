@@ -229,7 +229,7 @@ void* pub_thread_method(void* arg)
                 app->img_msg.header.stamp = ros::Time::now();
                 if (img_ptr->format ==  TANGO_HAL_PIXEL_FORMAT_YCrCb_420_SP)
                 {
-                //TODO: Use openGLES to make conversion faster
+                //TODO: Use openGLES to make conversion faster?
                 //Does img_ptr->data[] need to be updated?
                 decodeYUV420SP(&app->img_msg.data[0], &img_ptr->data[0], img_ptr->width, img_ptr->height);
                 }
