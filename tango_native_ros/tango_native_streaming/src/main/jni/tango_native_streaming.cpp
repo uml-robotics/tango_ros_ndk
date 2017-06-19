@@ -61,7 +61,7 @@ char ros_master[256],
      tango_base_link[256],
      tango_pose[256];
 
-     bool running = false;
+     static bool running = false;
 
 namespace {
 
@@ -141,6 +141,7 @@ void* pub_thread_method(void* arg)
         ros::spinOnce();
         rate.sleep();
     }
+    return NULL;
 }
 }
 
@@ -292,7 +293,11 @@ void TangoNativeStreamingApp::OnPause() {
   LOGI("Stopping pub_thread");
   pthread_join(pub_thread, NULL);
   LOGI("pub_thread stopped");
-  ros::shutdown();
+  // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
+  // right now can only be paused, and ros settings cannot be changed
+  //(ctxt.nh)->shutdown();
+  //ros::shutdown();
+  (ctxt.nh) = nullptr;
   LOGI("ros stopped");
   TangoConfig_free(tango_config_);
   tango_config_ = nullptr;
@@ -322,8 +327,6 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
               *in_tango_prefix = env->GetStringUTFChars(js_tango_prefix, NULL),
               *in_tango_namespace = env->GetStringUTFChars(js_tango_namespace, NULL);
 
-   LOGI("in_ros_master: %s", in_ros_master);
-
    strcpy(ros_master, in_ros_master);
    env->ReleaseStringUTFChars(js_ros_master, in_ros_master);
 
@@ -350,8 +353,6 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
    strcat(tango_base_link, TANGO_BASE_LINK_SUFFIX);
    strcpy(tango_pose, tango_prefix);
    strcat(tango_pose, TANGO_POSE_SUFFIX);
-
-   LOGI("ros_master_uri: %s", ros_master_uri);
 
   int seq = 0;
   sensor_msgs::PointField x, y, z, c;
@@ -400,6 +401,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
   for(int i = 0; i < argc; i++){
       LOGI("%s", argv[i]);
   }
+
+
   ros::init(argc, &argv[0], tango_namespace);
 
   LOGI("GOING TO NODEHANDLE");
@@ -451,8 +454,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
   base_to_depth.child_frame_id = tango_camera_depth;
   base_to_color.header.frame_id = tango_base_link;
   base_to_color.child_frame_id = tango_camera_color;
-  pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
-  known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
+  if (pc_pub == NULL) pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
+  if (known_pose_sub == NULL) known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
   int version = 0;
   TangoErrorType err = TangoSupport_GetTangoVersion(env, caller_activity, &version);
   if (err != TANGO_SUCCESS || version < kTangoCoreMinimumVersion) {

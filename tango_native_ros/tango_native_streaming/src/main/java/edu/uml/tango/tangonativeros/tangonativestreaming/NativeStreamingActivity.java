@@ -52,6 +52,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.View;
 
 /**
  * The main activity of the hello depth perception example application.
@@ -97,6 +98,7 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
         Intent intent = new Intent();
         intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
         boolean success = (getPackageManager().resolveService(intent, 0) != null);
@@ -133,5 +135,9 @@ public class NativeStreamingActivity extends Activity {
         ros_ip_jstr = savedInstanceState.getString("ROS_IP");
         tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX");
         namespace_jstr = savedInstanceState.getString("NAMESPACE");
+    }
+
+    public void stopStreaming(View view) {
+        finish();
     }
 }
