@@ -64,7 +64,8 @@ import android.view.View;
  */
 public class NativeStreamingActivity extends Activity {
 
-    public static String ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
+    public static String master_prefix, ros_master, master_port, ros_ip, tango_prefix, namespace,
+                    ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
 
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
@@ -82,16 +83,25 @@ public class NativeStreamingActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            ros_master_jstr = savedInstanceState.getString("ROS_MASTER");
-            ros_ip_jstr = savedInstanceState.getString("ROS_IP");
-            tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX");
-            namespace_jstr = savedInstanceState.getString("NAMESPACE");
+            master_prefix = savedInstanceState.getString("MASTER_PREFIX");
+            ros_master = savedInstanceState.getString("ROS_MASTER");
+            master_port = savedInstanceState.getString("MASTER_PORT");
+            ros_ip = savedInstanceState.getString("ROS_IP");
+            tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
+            namespace = savedInstanceState.getString("NAMESPACE");
         } else {
             Intent intent = getIntent();
-            ros_master_jstr = intent.getStringExtra("ROS_MASTER");
-            ros_ip_jstr = intent.getStringExtra("ROS_IP");
-            tango_prefix_jstr = intent.getStringExtra("TANGO_PREFIX");
-            namespace_jstr = intent.getStringExtra("NAMESPACE");
+            master_prefix = intent.getStringExtra("MASTER_PREFIX");
+            ros_master = intent.getStringExtra("ROS_MASTER");
+            master_port = intent.getStringExtra("MASTER_PORT");
+            ros_ip = intent.getStringExtra("ROS_IP");
+            tango_prefix = intent.getStringExtra("TANGO_PREFIX");
+            namespace = intent.getStringExtra("NAMESPACE");
+
+            ros_master_jstr = master_prefix + ros_master + ':' + master_port;
+            ros_ip_jstr = ros_ip;
+            tango_prefix_jstr = tango_prefix;
+            namespace_jstr = namespace;
         }
         setContentView(R.layout.activity_depth_perception);
         TangoJniNative.onCreate(this);
@@ -119,12 +129,6 @@ public class NativeStreamingActivity extends Activity {
         TangoJniNative.onPause();
         unbindService(mTangoServiceConnection);
         super.onPause();
-//        Intent i = getBaseContext().getPackageManager()
-//                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(i);
-//        finish();
-//        System.exit(0);
     }
 
     @Override
@@ -146,7 +150,19 @@ public class NativeStreamingActivity extends Activity {
         namespace_jstr = savedInstanceState.getString("NAMESPACE");
     }
 
+    @Override
+    public void onBackPressed() {
+        stopStreaming(null);
+    }
+
     public void stopStreaming(View view) {
+        onPause();
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        i.putExtras(getIntent());
+//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
         finish();
+        System.exit(0);
     }
 }
