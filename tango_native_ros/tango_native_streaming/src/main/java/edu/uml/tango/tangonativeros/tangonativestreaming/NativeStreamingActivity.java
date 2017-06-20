@@ -123,8 +123,8 @@ public class NativeStreamingActivity extends Activity {
 //                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
 //        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        startActivity(i);
-        finish();
-        System.exit(0);
+//        finish();
+//        System.exit(0);
     }
 
     @Override
