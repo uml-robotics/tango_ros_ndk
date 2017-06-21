@@ -27,6 +27,7 @@ LOCAL_SRC_FILES := jni_interface.cpp \
                    tango_native_streaming.cpp
 
 LOCAL_LDLIBS    := -llog -L$(SYSROOT)/usr/lib
+
 LOCAL_STATIC_LIBRARIES := roscpp_android_ndk
 include $(BUILD_SHARED_LIBRARY)
 

@@ -33,6 +33,7 @@
 
 #include <android/log.h>
 #include <pthread.h>
+#include <jni.h>
 
 //TANGO INCLUDES
 #include "tango_client_api.h" 
@@ -48,6 +49,7 @@
 #include <std_msgs/Header.h>
 #include <sensor_msgs/PointField.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <jni.h>
 
@@ -60,20 +62,26 @@ namespace tango_native_streaming {
 struct tango_context{
   ros::NodeHandle* nh;
   TangoSupportPointCloudManager *pc_manager;
+  TangoSupportImageBufferManager *image_manager;
   pthread_mutex_t* pose_mutex_ptr;
   geometry_msgs::TransformStamped* odom_to_base_ptr;
+  sensor_msgs::Image* img_msg_ptr;
+  bool image_manager_ready;
 };
 
 class TangoNativeStreamingApp {
  public:
   unsigned int seq;
+  unsigned int img_seq;
   unsigned int map_to_odom_seq;
   unsigned int odom_to_base_seq;
   pthread_t pub_thread;
   pthread_mutex_t pose_mutex;
   ros::Publisher pc_pub;
+  ros::Publisher img_pub;
   ros::Subscriber known_pose_sub;
   sensor_msgs::PointCloud2 pc_msg;
+  sensor_msgs::Image img_msg;
   tango_context ctxt;
   geometry_msgs::TransformStamped map_to_odom;
   geometry_msgs::TransformStamped odom_to_base;
@@ -85,7 +93,10 @@ class TangoNativeStreamingApp {
   tf2_ros::Buffer* tf_buffer;
   tf2_ros::TransformListener* tf_listener;
   // Class constructor.
-  TangoNativeStreamingApp() : tango_config_(nullptr), tf_bcaster(nullptr), static_tf_bcaster(nullptr), tf_buffer(nullptr), tf_listener(nullptr), map_to_odom_seq(0), odom_to_base_seq(0) {}
+  TangoNativeStreamingApp() : tango_config_(nullptr), tf_bcaster(nullptr), static_tf_bcaster(nullptr), tf_buffer(nullptr), tf_listener(nullptr), map_to_odom_seq(0), odom_to_base_seq(0), img_seq(0)
+  {
+    ctxt.img_msg_ptr = &img_msg;
+  }
 
   // Class destructor.
   ~TangoNativeStreamingApp() {

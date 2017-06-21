@@ -127,7 +127,6 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     protected void onResume() {
-
 //        if (isPaused) {
 //            Intent intent = new Intent(this, NativeStreamingActivity.class);
 //            intent.putExtra("MASTER_PREFIX", master_prefix);
