@@ -262,9 +262,9 @@ void* pub_thread_method(void* arg)
 
 namespace tango_native_streaming {
 
-//TODO: Run ROS initialization on separate thread so Android does not complain
-void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity) {
-    LOGI("TANGO_NATIVE_STREAMING STARTING");
+void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity)
+{
+  LOGI("Starting...");
 }
 
 void TangoNativeStreamingApp::SetCurrentPoseCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr& known_pose)
@@ -330,10 +330,10 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
   }
 
   err = TangoConfig_setInt32(tango_config_, "config_depth_mode", TANGO_POINTCLOUD_XYZC);
-  if (err != TANGO_SUCCESS) {
-    LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
-    std::exit(EXIT_SUCCESS);
-  }
+    if (err != TANGO_SUCCESS) {
+      LOGE("Setting pointcloud mode to XYZc failed with error code: %d.", err);
+      std::exit(EXIT_SUCCESS);
+    }
 
   int32_t max_point_cloud_elements;
   int ret = TangoConfig_getInt32(tango_config_, "max_point_cloud_elements",
@@ -352,7 +352,10 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
 
   err = TangoService_connectOnPointCloudAvailable(onPointCloudAvailable);
   if (err != TANGO_SUCCESS) {
-    LOGE( "Failed to connect to point cloud callback with error code: %d", err);
+    LOGE(
+        "TangoNativeStreamingApp::OnTangoServiceConnected,"
+        "Failed to connect to point cloud callback with error code: %d",
+        err);
     std::exit(EXIT_SUCCESS);
   }
 
@@ -529,7 +532,7 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
   }
 
   int argc = 3;
-  char *argv[] = {(char*)"nothing_important" , ros_master_uri, ros_ip_uri};
+  char *argv[] = {"nothing_important" , ros_master_uri, ros_ip_uri};
   LOGI("GOING TO ROS INIT");
 
   for(int i = 0; i < argc; i++){
