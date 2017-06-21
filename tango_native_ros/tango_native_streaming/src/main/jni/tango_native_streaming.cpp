@@ -122,20 +122,6 @@ void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   }
 }
 
-void onPoseAvailable(void* context, const TangoPoseData *pose) {
-  tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
-  if (pthread_mutex_trylock(ctxt->pose_mutex_ptr) == 0)
-  {
-    ctxt->odom_to_base_ptr->transform.translation.x = pose->translation[0];
-    ctxt->odom_to_base_ptr->transform.translation.y = pose->translation[1];
-    ctxt->odom_to_base_ptr->transform.translation.z = pose->translation[2];
-    ctxt->odom_to_base_ptr->transform.rotation.x = pose->orientation[0];
-    ctxt->odom_to_base_ptr->transform.rotation.y = pose->orientation[1];
-    ctxt->odom_to_base_ptr->transform.rotation.z = pose->orientation[2];
-    ctxt->odom_to_base_ptr->transform.rotation.w = pose->orientation[3];
-    pthread_mutex_unlock(ctxt->pose_mutex_ptr);
-  }
-}
 
 //Taken from stackoverflow: https://stackoverflow.com/questions/12469730/confusion-on-yuv-nv21-conversion-to-rgb
 void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
@@ -170,19 +156,6 @@ void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
             rgb[a] = b;
             a++;
        }
-  }
-}
-  void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
-  // Number of points in the point cloud.
-  tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
-  int ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
-  if (ret != TANGO_SUCCESS)
-  {
-    LOGE("ERROR UPDATING TANGO MANAGER");
-  }
-  else
-  {
-    LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
   }
 }
 
@@ -556,7 +529,7 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
   }
 
   int argc = 3;
-  char *argv[] = {"nothing_important" , ros_master_uri, ros_ip_uri};
+  char *argv[] = {(char*)"nothing_important" , ros_master_uri, ros_ip_uri};
   LOGI("GOING TO ROS INIT");
 
   for(int i = 0; i < argc; i++){
