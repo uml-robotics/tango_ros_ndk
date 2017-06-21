@@ -52,9 +52,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.view.View;
 
-// TODO figure out why the app doesn't restore from recent apps when previous transition was from this activity to recent apps
+// TODO find a less hacky way to force the ros node to restart on app lifecycle transitions, currently feels like I am torturing the app lifecycle be stopping and starting the activity manually
 
 /**
  * The main activity of the hello depth perception example application.
@@ -66,6 +67,8 @@ public class NativeStreamingActivity extends Activity {
 
     public static String master_prefix, ros_master, master_port, ros_ip, tango_prefix, namespace,
                     ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
+
+    public boolean isPaused = false;
 
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
@@ -108,24 +111,54 @@ public class NativeStreamingActivity extends Activity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        Intent intent = new Intent(this, NativeStreamingActivity.class);
+        intent.putExtra("MASTER_PREFIX", master_prefix);
+        intent.putExtra("ROS_MASTER", ros_master);
+        intent.putExtra("MASTER_PORT", master_port);
+        intent.putExtra("ROS_IP", ros_ip);
+        intent.putExtra("TANGO_PREFIX", tango_prefix);
+        intent.putExtra("NAMESPACE", namespace);
+        startActivity(intent);
+        finish();
+        System.exit(0);
+    }
+
+    @Override
     protected void onResume() {
 
-        super.onResume();
+//        if (isPaused) {
+//            Intent intent = new Intent(this, NativeStreamingActivity.class);
+//            intent.putExtra("MASTER_PREFIX", master_prefix);
+//            intent.putExtra("ROS_MASTER", ros_master);
+//            intent.putExtra("MASTER_PORT", master_port);
+//            intent.putExtra("ROS_IP", ros_ip);
+//            intent.putExtra("TANGO_PREFIX", tango_prefix);
+//            intent.putExtra("NAMESPACE", namespace);
+//            startActivity(intent);
+//            finish();
+//            System.exit(0);
+//        } else {
 
-        Intent intent = new Intent();
-        intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
-        boolean success = (getPackageManager().resolveService(intent, 0) != null);
-        // Attempt old service name
-        if (!success) {
-            intent = new Intent();
-            intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
-        }
-        bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
-        TangoJniNative.onResume(this);
+            super.onResume();
+
+            Intent intent = new Intent();
+            intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
+            boolean success = (getPackageManager().resolveService(intent, 0) != null);
+            // Attempt old service name
+            if (!success) {
+                intent = new Intent();
+                intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
+            }
+            bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
+            TangoJniNative.onResume(this);
+//        }
     }
 
     @Override
     protected void onPause() {
+        isPaused = isFinishing();
         TangoJniNative.onPause();
         unbindService(mTangoServiceConnection);
         super.onPause();
@@ -133,21 +166,34 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putString("ROS_MASTER", ros_master_jstr);
-        savedInstanceState.putString("ROS_IP", ros_ip_jstr);
-        savedInstanceState.putString("TANGO_PREFIX", tango_prefix_jstr);
-        savedInstanceState.putString("NAMESPACE", namespace_jstr);
-
+        savedInstanceState.putBoolean("IS_PAUSED", isPaused);
+        savedInstanceState.putString("ROS_MASTER_JSTR", ros_master_jstr);
+        savedInstanceState.putString("ROS_IP_JSTR", ros_ip_jstr);
+        savedInstanceState.putString("TANGO_PREFIX_JSTR", tango_prefix_jstr);
+        savedInstanceState.putString("NAMESPACE_JSTR", namespace_jstr);
+        savedInstanceState.putString("MASTER_PREFIX", master_prefix);
+        savedInstanceState.putString("ROS_MASTER", ros_master);
+        savedInstanceState.putString("MASTER_PORT", master_port);
+        savedInstanceState.putString("ROS_IP", ros_ip);
+        savedInstanceState.putString("TANGO_PREFIX", tango_prefix);
+        savedInstanceState.putString("NAMESPACE", namespace);
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        ros_master_jstr = savedInstanceState.getString("ROS_MASTER");
-        ros_ip_jstr = savedInstanceState.getString("ROS_IP");
-        tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX");
-        namespace_jstr = savedInstanceState.getString("NAMESPACE");
+        isPaused = savedInstanceState.getBoolean("IS_PAUSED");
+        ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
+        ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
+        tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX_JSTR");
+        namespace_jstr = savedInstanceState.getString("NAMESPACE_JSTR");
+        master_prefix = savedInstanceState.getString("MASTER_PREFIX");
+        ros_master = savedInstanceState.getString("ROS_MASTER");
+        master_port = savedInstanceState.getString("MASTER_PORT");
+        ros_ip = savedInstanceState.getString("ROS_IP");
+        tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
+        namespace = savedInstanceState.getString("NAMESPACE");
     }
 
     @Override
