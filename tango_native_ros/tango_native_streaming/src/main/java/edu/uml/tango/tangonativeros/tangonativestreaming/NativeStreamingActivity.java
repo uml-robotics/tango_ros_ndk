@@ -55,7 +55,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 
-// TODO find a less hacky way to force the ros node to restart on app lifecycle transitions, currently feels like I am torturing the app lifecycle by stopping and starting the activity manually, maybe by only stopping the node if the ip of the master has changed
+
 /**
  * The main activity of the hello depth perception example application.
  *
@@ -120,16 +120,6 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onRestart() {
         super.onRestart();
-//        Intent intent = new Intent(this, NativeStreamingActivity.class);
-//        intent.putExtra("MASTER_PREFIX", master_prefix);
-//        intent.putExtra("ROS_MASTER", ros_master);
-//        intent.putExtra("MASTER_PORT", master_port);
-//        intent.putExtra("ROS_IP", ros_ip);
-//        intent.putExtra("TANGO_PREFIX", tango_prefix);
-//        intent.putExtra("NAMESPACE", namespace);
-//        startActivity(intent);
-//        finish();
-//        System.exit(0);
     }
 
     @Override
@@ -151,13 +141,6 @@ public class NativeStreamingActivity extends Activity {
 
         if (needsRestart) {
             needsRestart = false;
-//            Intent intent = new Intent(this, NativeStreamingActivity.class);
-//            intent.putExtra("MASTER_PREFIX", master_prefix);
-//            intent.putExtra("ROS_MASTER", ros_master);
-//            intent.putExtra("MASTER_PORT", master_port);
-//            intent.putExtra("ROS_IP", ros_ip);
-//            intent.putExtra("TANGO_PREFIX", tango_prefix);
-//            intent.putExtra("NAMESPACE", namespace);
             Intent intent = getIntent();
             startActivity(intent);
             finish();
@@ -185,11 +168,6 @@ public class NativeStreamingActivity extends Activity {
         TangoJniNative.onPause();
         unbindService(mTangoServiceConnection);
         super.onPause();
-//        Intent i = getBaseContext().getPackageManager()
-//                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//        i.putExtras(getIntent());
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(i);
     }
 
     @Override
@@ -230,13 +208,11 @@ public class NativeStreamingActivity extends Activity {
     }
 
     public void stopStreaming(View view) {
-//        onPause();
         Intent i = getBaseContext().getPackageManager()
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
-//        System.exit(0);
     }
 }
