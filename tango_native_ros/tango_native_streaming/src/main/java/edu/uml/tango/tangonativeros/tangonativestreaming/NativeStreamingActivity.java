@@ -52,10 +52,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 
-// TODO find a less hacky way to force the ros node to restart on app lifecycle transitions, currently feels like I am torturing the app lifecycle be stopping and starting the activity manually
 
 /**
  * The main activity of the hello depth perception example application.
@@ -68,7 +67,7 @@ public class NativeStreamingActivity extends Activity {
     public static String master_prefix, ros_master, master_port, ros_ip, tango_prefix, namespace,
                     ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
 
-    public boolean isPaused = false;
+    public boolean isPaused = false, needsRestart = false;
 
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
@@ -86,6 +85,10 @@ public class NativeStreamingActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
+            ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
+            ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
+            tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX_JSTR");
+            namespace_jstr = savedInstanceState.getString("NAMESPACE_JSTR");
             master_prefix = savedInstanceState.getString("MASTER_PREFIX");
             ros_master = savedInstanceState.getString("ROS_MASTER");
             master_port = savedInstanceState.getString("MASTER_PORT");
@@ -100,45 +103,49 @@ public class NativeStreamingActivity extends Activity {
             ros_ip = intent.getStringExtra("ROS_IP");
             tango_prefix = intent.getStringExtra("TANGO_PREFIX");
             namespace = intent.getStringExtra("NAMESPACE");
-
-            ros_master_jstr = master_prefix + ros_master + ':' + master_port;
-            ros_ip_jstr = ros_ip;
-            tango_prefix_jstr = tango_prefix;
-            namespace_jstr = namespace;
         }
+
         setContentView(R.layout.activity_depth_perception);
         TangoJniNative.onCreate(this);
+    }
+
+    boolean hasConfigChanged() {
+        boolean restart = false;
+        if (ros_master_jstr != null || ros_ip_jstr != null || tango_prefix_jstr != null || namespace_jstr != null) {
+            restart = (ros_master_jstr != master_prefix + ros_master + ':' + master_port) || (ros_ip_jstr != ros_ip) || (tango_prefix_jstr != tango_prefix) || (namespace_jstr != namespace);
+        }
+        return restart;
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Intent intent = new Intent(this, NativeStreamingActivity.class);
-        intent.putExtra("MASTER_PREFIX", master_prefix);
-        intent.putExtra("ROS_MASTER", ros_master);
-        intent.putExtra("MASTER_PORT", master_port);
-        intent.putExtra("ROS_IP", ros_ip);
-        intent.putExtra("TANGO_PREFIX", tango_prefix);
-        intent.putExtra("NAMESPACE", namespace);
-        startActivity(intent);
-        finish();
-        System.exit(0);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("new intent", "gotten");
+
     }
 
     @Override
     protected void onResume() {
-//        if (isPaused) {
-//            Intent intent = new Intent(this, NativeStreamingActivity.class);
-//            intent.putExtra("MASTER_PREFIX", master_prefix);
-//            intent.putExtra("ROS_MASTER", ros_master);
-//            intent.putExtra("MASTER_PORT", master_port);
-//            intent.putExtra("ROS_IP", ros_ip);
-//            intent.putExtra("TANGO_PREFIX", tango_prefix);
-//            intent.putExtra("NAMESPACE", namespace);
-//            startActivity(intent);
-//            finish();
-//            System.exit(0);
-//        } else {
+
+        needsRestart = hasConfigChanged();
+
+        ros_master_jstr = master_prefix + ros_master + ':' + master_port;
+        ros_ip_jstr = ros_ip;
+        tango_prefix_jstr = tango_prefix;
+        namespace_jstr = namespace;
+
+        if (needsRestart) {
+            needsRestart = false;
+            Intent intent = getIntent();
+            startActivity(intent);
+            finish();
+            System.exit(0);
+        } else {
 
             super.onResume();
 
@@ -152,7 +159,7 @@ public class NativeStreamingActivity extends Activity {
             }
             bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
             TangoJniNative.onResume(this);
-//        }
+        }
     }
 
     @Override
@@ -201,13 +208,11 @@ public class NativeStreamingActivity extends Activity {
     }
 
     public void stopStreaming(View view) {
-        onPause();
         Intent i = getBaseContext().getPackageManager()
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
-        System.exit(0);
     }
 }

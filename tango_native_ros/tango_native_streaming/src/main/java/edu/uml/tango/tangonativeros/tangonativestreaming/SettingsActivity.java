@@ -127,7 +127,7 @@ public class SettingsActivity extends Activity {
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
         startActivity(intent);
-        finish();
+        //finish();
     }
 
     @Override
