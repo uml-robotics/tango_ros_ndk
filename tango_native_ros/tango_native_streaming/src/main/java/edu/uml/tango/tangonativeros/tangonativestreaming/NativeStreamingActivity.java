@@ -185,11 +185,11 @@ public class NativeStreamingActivity extends Activity {
         TangoJniNative.onPause();
         unbindService(mTangoServiceConnection);
         super.onPause();
-        Intent i = getBaseContext().getPackageManager()
-                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-        i.putExtras(getIntent());
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
+//        Intent i = getBaseContext().getPackageManager()
+//                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//        i.putExtras(getIntent());
+//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        startActivity(i);
     }
 
     @Override
@@ -231,11 +231,11 @@ public class NativeStreamingActivity extends Activity {
 
     public void stopStreaming(View view) {
 //        onPause();
-//        Intent i = getBaseContext().getPackageManager()
-//                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//        i.putExtras(getIntent());
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(i);
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        i.putExtras(getIntent());
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
         finish();
 //        System.exit(0);
     }
