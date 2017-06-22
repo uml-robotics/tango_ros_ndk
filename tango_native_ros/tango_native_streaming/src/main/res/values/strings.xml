@@ -12,4 +12,12 @@
     <string name="STOP_BTN">Stop Streaming</string>
     <string name="ROS_PORT_LBL">Port</string>
     <string name="ROS_MASTER_PREFIX_LBL">ROS Master Prefix</string>
+
+    <string name="edit_new_master_prefix">Enter New Prefix</string>
+    <string name="button_back_to_list_master_prefix">Back To List</string>
+    <string name="button_new_master_prefix">Set New Prefix</string>
+
+    <string name="edit_new_master_ip">Enter New IP</string>
+    <string name="button_back_to_list_master_ip">Back To List</string>
+    <string name="button_new_master_ip">Set New IP</string>
 </resources>

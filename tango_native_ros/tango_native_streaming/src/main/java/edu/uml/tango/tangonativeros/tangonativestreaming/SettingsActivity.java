@@ -5,10 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +27,13 @@ public class SettingsActivity extends Activity {
                          tango_prefix = "tango_brain_0/",
                          namespace = "tango_brain_0";
     public TextView ros_master_prefix_edit, ros_master_edit, ros_port_edit, tango_addr_edit, prefix_edit, tango_namespace_edit;
+    private boolean isNewMasterPrefix = false;
+    private Spinner masterPrefixSpinner;
+    private EditText enterNewMasterPrefixEdit;
+    private Button backToListMasterPrefixBtn;
+    private Button enterNewMasterPrefixBtn;
+    private List<String> str = new ArrayList<String>();
+    private List<String> revStr = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +84,11 @@ public class SettingsActivity extends Activity {
         prefix_edit.setText(tango_prefix);
 
         tango_namespace_edit.setText(namespace);
+
+        masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, revStr);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        masterPrefixSpinner.setAdapter(adapter);
     }
 
     @Override
@@ -105,7 +122,7 @@ public class SettingsActivity extends Activity {
         } catch (Exception ex) { } // for now eat exceptions
         return "";
     }
-
+//button leads to here
     public void startStreaming(View view) {
         master_prefix = ros_master_prefix_edit.getText().toString();
         ros_master = ros_master_edit.getText().toString();
@@ -168,6 +185,30 @@ public class SettingsActivity extends Activity {
         tango_addr_edit.setText(ros_ip);
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
+    }
+
+    public void enterNewMasterPrefix(View view) {
+        isNewMasterPrefix = true;
+        masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
+        masterPrefixSpinner.setVisibility(View.GONE);
+        enterNewMasterPrefixBtn = (Button) findViewById(R.id.NEW_MASTER_PREFIX_BTN);
+        enterNewMasterPrefixBtn.setVisibility(View.GONE);
+        enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
+        enterNewMasterPrefixEdit.setVisibility(View.VISIBLE);
+        backToListMasterPrefixBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_PREFIX_BTN);
+        backToListMasterPrefixBtn.setVisibility(View.VISIBLE);
+    }
+
+    public void backToListMasterPrefix(View view) {
+        isNewMasterPrefix = false;
+        enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
+        enterNewMasterPrefixEdit.setVisibility(View.GONE);
+        backToListMasterPrefixBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_PREFIX_BTN);
+        backToListMasterPrefixBtn.setVisibility(View.GONE);
+        masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
+        masterPrefixSpinner.setVisibility(View.VISIBLE);
+        enterNewMasterPrefixBtn = (Button) findViewById(R.id.NEW_MASTER_PREFIX_BTN);
+        enterNewMasterPrefixBtn.setVisibility(View.VISIBLE);
     }
 
 }
