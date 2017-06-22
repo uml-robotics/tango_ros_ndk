@@ -69,6 +69,8 @@ public class NativeStreamingActivity extends Activity {
 
     public boolean isPaused = false, needsRestart = false;
 
+    public boolean nativeError = false;
+
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -146,6 +148,11 @@ public class NativeStreamingActivity extends Activity {
             finish();
             System.exit(0);
         } else {
+
+        if (nativeError) {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
 
             super.onResume();
 

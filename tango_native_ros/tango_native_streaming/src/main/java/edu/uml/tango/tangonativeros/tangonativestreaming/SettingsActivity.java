@@ -21,7 +21,8 @@ public class SettingsActivity extends Activity {
                          ros_ip = "",
                          tango_prefix = "tango_brain_0/",
                          namespace = "tango_brain_0";
-    public TextView ros_master_prefix_edit, ros_master_edit, ros_port_edit, tango_addr_edit, prefix_edit, tango_namespace_edit;
+    public TextView ros_master_prefix_edit, ros_master_edit, ros_port_edit, tango_addr_edit, prefix_edit, tango_namespace_edit,
+                    err_no_master;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,8 @@ public class SettingsActivity extends Activity {
         tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
         prefix_edit = (TextView) findViewById(R.id.PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
+
+        err_no_master = (TextView) findViewById(R.id.ERR_NO_MASTER_LBL);
 
         if (savedInstanceState != null) {
             master_prefix = savedInstanceState.getString("MASTER_PREFIX");
@@ -126,8 +129,8 @@ public class SettingsActivity extends Activity {
         intent.putExtra("ROS_IP", ros_ip);
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
-        startActivity(intent);
-        //finish();
+        startActivityForResult(intent, 0);
+//        finish();
     }
 
     @Override
@@ -168,6 +171,17 @@ public class SettingsActivity extends Activity {
         tango_addr_edit.setText(ros_ip);
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_CANCELED) {
+                err_no_master.setVisibility(View.VISIBLE);
+            } else {
+                err_no_master.setVisibility(View.GONE);
+            }
+        }
     }
 
 }

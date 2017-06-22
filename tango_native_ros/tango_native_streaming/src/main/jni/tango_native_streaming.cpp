@@ -452,7 +452,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
    jfieldID fidMaster = (*env).GetStaticFieldID(thisClass, "ros_master_jstr", "Ljava/lang/String;"),
             fidRosIp = (*env).GetStaticFieldID(thisClass, "ros_ip_jstr", "Ljava/lang/String;"),
             fidPrefix = (*env).GetStaticFieldID(thisClass, "tango_prefix_jstr", "Ljava/lang/String;"),
-            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;");
+            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;"),
+            fidError = (*env).GetFieldID(thisClass, "nativeError", "Z");
 
    jstring js_ros_master = (jstring)env->GetStaticObjectField(thisClass, fidMaster),
            js_ros_ip = (jstring)env->GetStaticObjectField(thisClass, fidRosIp),
@@ -551,6 +552,7 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
       LOGI("ROS MASTER IS UP!");
   } else {
       LOGI("NO ROS MASTER.");
+      std::exit(EXIT_SUCCESS);
   }
   LOGI("%s", master_uri.c_str());
   ctxt.pose_mutex_ptr = &pose_mutex;

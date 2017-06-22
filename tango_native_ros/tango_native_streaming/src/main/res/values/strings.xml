@@ -12,4 +12,5 @@
     <string name="STOP_BTN">Stop Streaming</string>
     <string name="ROS_PORT_LBL">Port</string>
     <string name="ROS_MASTER_PREFIX_LBL">ROS Master Prefix</string>
+    <string name="ERR_NO_MASTER_LBL">Error: No ROS Master found</string>
 </resources>
