@@ -32,6 +32,12 @@ public class SettingsActivity extends Activity {
     private EditText enterNewMasterPrefixEdit;
     private Button backToListMasterPrefixBtn;
     private Button enterNewMasterPrefixBtn;
+
+    private boolean isNewMasterIP = false;
+    private Spinner masterIPSpinner;
+    private EditText enterNewMasterIPEdit;
+    private Button backToListMasterIPBtn;
+    private Button enterNewMasterIPBtn;
     private List<String> str = new ArrayList<String>();
     private List<String> revStr = new ArrayList<String>();
 
@@ -58,9 +64,9 @@ public class SettingsActivity extends Activity {
         setContentView(R.layout.activity_settings);
         ros_master_prefix_edit = (TextView) findViewById(R.id.MASTER_PREFIX_EDIT);
         ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        ros_port_edit = (TextView) findViewById(R.id.MASTER_PORT_EDIT);
+        ros_port_edit = (TextView) findViewById(R.id.PORT_EDIT);
         tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
-        prefix_edit = (TextView) findViewById(R.id.PREFIX_EDIT);
+        prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
 
         if (savedInstanceState != null) {
@@ -175,9 +181,9 @@ public class SettingsActivity extends Activity {
         namespace = savedInstanceState.getString("NAMESPACE");
         ros_master_prefix_edit = (TextView) findViewById(R.id.MASTER_PREFIX_EDIT);
         ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        ros_port_edit = (TextView) findViewById(R.id.MASTER_PORT_EDIT);
+        ros_port_edit = (TextView) findViewById(R.id.PORT_EDIT);
         tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
-        prefix_edit = (TextView) findViewById(R.id.PREFIX_EDIT);
+        prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
         ros_master_prefix_edit.setText(master_prefix);
         ros_master_edit.setText(ros_master);
@@ -209,6 +215,30 @@ public class SettingsActivity extends Activity {
         masterPrefixSpinner.setVisibility(View.VISIBLE);
         enterNewMasterPrefixBtn = (Button) findViewById(R.id.NEW_MASTER_PREFIX_BTN);
         enterNewMasterPrefixBtn.setVisibility(View.VISIBLE);
+    }
+
+    public void enterNewMasterIP(View view) {
+        isNewMasterIP = true;
+        masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+        masterIPSpinner.setVisibility(View.GONE);
+        enterNewMasterIPBtn = (Button) findViewById(R.id.NEW_MASTER_IP_BTN);
+        enterNewMasterIPBtn.setVisibility(View.GONE);
+        enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+        enterNewMasterIPEdit.setVisibility(View.VISIBLE);
+        backToListMasterIPBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_IP_BTN);
+        backToListMasterIPBtn.setVisibility(View.VISIBLE);
+    }
+
+    public void backToListMasterIP(View view) {
+        isNewMasterIP = false;
+        enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+        enterNewMasterIPEdit.setVisibility(View.GONE);
+        backToListMasterIPBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_IP_BTN);
+        backToListMasterIPBtn.setVisibility(View.GONE);
+        masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+        masterIPSpinner.setVisibility(View.VISIBLE);
+        enterNewMasterIPBtn = (Button) findViewById(R.id.NEW_MASTER_IP_BTN);
+        enterNewMasterIPBtn.setVisibility(View.VISIBLE);
     }
 
 }

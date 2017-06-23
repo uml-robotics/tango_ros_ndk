@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textUri"
-            android:text="@string/edit_new_master_prefix" />
+            android:text="@string/edit_new_master_ip" />
         <Button
             android:id="@+id/NEW_MASTER_IP_BTN"
             android:layout_width="wrap_content"
@@ -86,31 +86,31 @@
             android:layout_height="wrap_content"
             android:text="@string/ROS_PORT_LBL" />
         <Spinner
-            android:id="@+id/MASTER_PREFIX_SPINNER"
+            android:id="@+id/PORT_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"/>
         <EditText
-            android:id="@+id/MASTER_PREFIX_EDIT"
+            android:id="@+id/PORT_EDIT"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textUri"
-            android:text="@string/edit_new_master_prefix" />
+            android:text="@string/edit_new_port" />
         <Button
-            android:id="@+id/NEW_MASTER_PREFIX_BTN"
+            android:id="@+id/NEW_PORT_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewMasterPrefix"
-            android:text="@string/button_new_master_prefix" />
+            android:onClick="enterNewPort"
+            android:text="@string/button_new_port" />
         <Button
-            android:id="@+id/BACK_TO_LIST_MASTER_PREFIX_BTN"
+            android:id="@+id/BACK_TO_LIST_PORT_BTN"
             android:visibility = "gone"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:onClick="backToListMasterPrefix"
-            android:text="@string/button_back_to_list_master_prefix" />
+            android:onClick="backToListPort"
+            android:text="@string/button_back_to_list_port" />
     </TableRow>
 
     <TableRow
@@ -123,31 +123,31 @@
             android:layout_height="wrap_content"
             android:text="@string/ROS_NODE_LBL" />
         <Spinner
-            android:id="@+id/MASTER_PREFIX_SPINNER"
+            android:id="@+id/NODE_IP_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"/>
         <EditText
-            android:id="@+id/MASTER_PREFIX_EDIT"
+            android:id="@+id/NODE_IP_EDIT"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textUri"
-            android:text="@string/edit_new_master_prefix" />
+            android:text="@string/edit_new_node_ip" />
         <Button
-            android:id="@+id/NEW_MASTER_PREFIX_BTN"
+            android:id="@+id/NEW_NODE_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewMasterPrefix"
-            android:text="@string/button_new_master_prefix" />
+            android:onClick="enterNewNodeIP"
+            android:text="@string/button_new_node_ip" />
         <Button
-            android:id="@+id/BACK_TO_LIST_MASTER_PREFIX_BTN"
+            android:id="@+id/BACK_TO_LIST_NODE_IP_BTN"
             android:visibility = "gone"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:onClick="backToListMasterPrefix"
-            android:text="@string/button_back_to_list_master_prefix" />
+            android:onClick="backToListNodeIP"
+            android:text="@string/button_back_to_list_node_ip" />
     </TableRow>
 
     <TableRow
@@ -160,31 +160,31 @@
             android:layout_height="wrap_content"
             android:text="@string/ROS_PREFIX_LBL" />
         <Spinner
-            android:id="@+id/MASTER_PREFIX_SPINNER"
+            android:id="@+id/ROS_PREFIX_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"/>
         <EditText
-            android:id="@+id/MASTER_PREFIX_EDIT"
+            android:id="@+id/ROS_PREFIX_EDIT"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textUri"
-            android:text="@string/edit_new_master_prefix" />
+            android:text="@string/edit_new_ros_prefix" />
         <Button
-            android:id="@+id/NEW_MASTER_PREFIX_BTN"
+            android:id="@+id/NEW_ROS_PREFIX_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewMasterPrefix"
-            android:text="@string/button_new_master_prefix" />
+            android:onClick="enterNeRosPrefix"
+            android:text="@string/button_new_ros_prefix" />
         <Button
-            android:id="@+id/BACK_TO_LIST_MASTER_PREFIX_BTN"
+            android:id="@+id/BACK_TO_LIST_ROS_PREFIX_BTN"
             android:visibility = "gone"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:onClick="backToListMasterPrefix"
-            android:text="@string/button_back_to_list_master_prefix"  />
+            android:onClick="backToListRosPrefix"
+            android:text="@string/button_back_to_list_ros_prefix"  />
     </TableRow>
 
     <TableRow
@@ -197,31 +197,31 @@
             android:layout_height="wrap_content"
             android:text="@string/ROS_NAMESPACE_LBL" />
         <Spinner
-            android:id="@+id/MASTER_PREFIX_SPINNER"
+            android:id="@+id/NAMESPACE_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"/>
         <EditText
-            android:id="@+id/MASTER_PREFIX_EDIT"
+            android:id="@+id/NAMESPACE_EDIT"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textUri"
-            android:text="@string/edit_new_master_prefix" />
+            android:text="@string/edit_new_namespace" />
         <Button
-            android:id="@+id/NEW_MASTER_PREFIX_BTN"
+            android:id="@+id/NEW_NAMESPACE_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewMasterPrefix"
-            android:text="@string/button_new_master_prefix" />
+            android:onClick="enterNewNamespace"
+            android:text="@string/button_new_namespace" />
         <Button
-            android:id="@+id/BACK_TO_LIST_MASTER_PREFIX_BTN"
+            android:id="@+id/BACK_TO_LIST_NAMESPACE_BTN"
             android:visibility = "gone"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:onClick="backToListMasterPrefix"
-            android:text="@string/button_back_to_list_master_prefix" >
+            android:onClick="backToListNamespace"
+            android:text="@string/button_back_to_list_namespace" />
     </TableRow>
 
     <TableRow

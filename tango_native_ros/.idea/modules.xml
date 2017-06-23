@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/tango_native_ros.iml" filepath="$PROJECT_DIR$/tango_native_ros.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tango_native_ros.iml" filepath="$PROJECT_DIR$/tango_native_ros.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tango_native_streaming/tango_native_streaming.iml" filepath="$PROJECT_DIR$/tango_native_streaming/tango_native_streaming.iml" />
       <module fileurl="file://$PROJECT_DIR$/tango_native_streaming/tango_native_streaming.iml" filepath="$PROJECT_DIR$/tango_native_streaming/tango_native_streaming.iml" />
     </modules>
   </component>

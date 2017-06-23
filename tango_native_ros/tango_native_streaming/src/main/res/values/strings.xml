@@ -20,4 +20,20 @@
     <string name="edit_new_master_ip">Enter New IP</string>
     <string name="button_back_to_list_master_ip">Back To List</string>
     <string name="button_new_master_ip">Set New IP</string>
+
+    <string name="edit_new_port">Enter New Port</string>
+    <string name="button_back_to_list_port">Back To List</string>
+    <string name="button_new_port">Set New Port</string>
+
+    <string name="edit_new_node_ip">Enter New IP</string>
+    <string name="button_back_to_list_node_ip">Back To List</string>
+    <string name="button_new_node_ip">Set New IP</string>
+
+    <string name="edit_new_ros_prefix">Enter New Prefix</string>
+    <string name="button_back_to_list_ros_prefix">Back To List</string>
+    <string name="button_new_ros_prefix">Set New Prefix</string>
+
+    <string name="edit_new_namespace">Enter New Namespace</string>
+    <string name="button_back_to_list_namespace">Back To List</string>
+    <string name="button_new_namespace">Set New Namespace</string>
 </resources>
