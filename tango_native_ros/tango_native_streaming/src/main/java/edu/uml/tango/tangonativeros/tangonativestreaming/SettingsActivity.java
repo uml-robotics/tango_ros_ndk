@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 public class SettingsActivity extends Activity {
 
     public static String master_prefix = "http://",
@@ -30,14 +29,33 @@ public class SettingsActivity extends Activity {
     private boolean isNewMasterPrefix = false;
     private Spinner masterPrefixSpinner;
     private EditText enterNewMasterPrefixEdit;
-    private Button backToListMasterPrefixBtn;
     private Button enterNewMasterPrefixBtn;
 
     private boolean isNewMasterIP = false;
     private Spinner masterIPSpinner;
     private EditText enterNewMasterIPEdit;
-    private Button backToListMasterIPBtn;
     private Button enterNewMasterIPBtn;
+
+    private boolean isNewPort = false;
+    private Spinner portSpinner;
+    private EditText enterNewPortEdit;
+    private Button enterNewPortBtn;
+
+    private boolean isNewNodeIP = false;
+    private Spinner nodeIPSpinner;
+    private EditText enterNewNodeIPEdit;
+    private Button enterNewNodeIPBtn;
+
+    private boolean isNewRosPrefix = false;
+    private Spinner rosPrefixSpinner;
+    private EditText enterNewRosPrefixEdit;
+    private Button enterNewRosPrefixBtn;
+
+    private boolean isNewNamespace = false;
+    private Spinner namespaceSpinner;
+    private EditText enterNewNamespaceEdit;
+    private Button enterNewNamespaceBtn;
+
     private List<String> str = new ArrayList<String>();
     private List<String> revStr = new ArrayList<String>();
 
@@ -128,7 +146,6 @@ public class SettingsActivity extends Activity {
         } catch (Exception ex) { } // for now eat exceptions
         return "";
     }
-//button leads to here
     public void startStreaming(View view) {
         master_prefix = ros_master_prefix_edit.getText().toString();
         ros_master = ros_master_edit.getText().toString();
@@ -192,53 +209,111 @@ public class SettingsActivity extends Activity {
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
     }
-
-    public void enterNewMasterPrefix(View view) {
-        isNewMasterPrefix = true;
+//TODO: Use "STRING_NAME" + "STRING_TYPE" for ids and prints
+    public void toggleMasterPrefix(View view) {
         masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        masterPrefixSpinner.setVisibility(View.GONE);
         enterNewMasterPrefixBtn = (Button) findViewById(R.id.NEW_MASTER_PREFIX_BTN);
-        enterNewMasterPrefixBtn.setVisibility(View.GONE);
         enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
-        enterNewMasterPrefixEdit.setVisibility(View.VISIBLE);
-        backToListMasterPrefixBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_PREFIX_BTN);
-        backToListMasterPrefixBtn.setVisibility(View.VISIBLE);
+        if(!isNewMasterPrefix) {
+            isNewMasterPrefix = true;
+            masterPrefixSpinner.setVisibility(View.GONE);
+            enterNewMasterPrefixBtn.setText("Back to list");
+            enterNewMasterPrefixEdit.setVisibility(View.VISIBLE);
+        }
+        else {
+            isNewMasterPrefix = false;
+            masterPrefixSpinner.setVisibility(View.VISIBLE);
+            enterNewMasterPrefixBtn.setText("Set New Prefix");
+            enterNewMasterPrefixEdit.setVisibility(View.GONE);
+        }
     }
 
-    public void backToListMasterPrefix(View view) {
-        isNewMasterPrefix = false;
-        enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
-        enterNewMasterPrefixEdit.setVisibility(View.GONE);
-        backToListMasterPrefixBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_PREFIX_BTN);
-        backToListMasterPrefixBtn.setVisibility(View.GONE);
-        masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        masterPrefixSpinner.setVisibility(View.VISIBLE);
-        enterNewMasterPrefixBtn = (Button) findViewById(R.id.NEW_MASTER_PREFIX_BTN);
-        enterNewMasterPrefixBtn.setVisibility(View.VISIBLE);
-    }
-
-    public void enterNewMasterIP(View view) {
-        isNewMasterIP = true;
+    public void toggleMasterIP(View view) {
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        masterIPSpinner.setVisibility(View.GONE);
         enterNewMasterIPBtn = (Button) findViewById(R.id.NEW_MASTER_IP_BTN);
-        enterNewMasterIPBtn.setVisibility(View.GONE);
         enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-        enterNewMasterIPEdit.setVisibility(View.VISIBLE);
-        backToListMasterIPBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_IP_BTN);
-        backToListMasterIPBtn.setVisibility(View.VISIBLE);
+       if(!isNewMasterIP) {
+           isNewMasterIP = true;
+           masterIPSpinner.setVisibility(View.GONE);
+           enterNewMasterIPBtn.setText("Back to list");
+           enterNewMasterIPEdit.setVisibility(View.VISIBLE);
+       }
+       else{
+           isNewMasterIP = false;
+           masterIPSpinner.setVisibility(View.VISIBLE);
+           enterNewMasterIPBtn.setText("Set New IP");
+           enterNewMasterIPEdit.setVisibility(View.GONE);
+       }
     }
 
-    public void backToListMasterIP(View view) {
-        isNewMasterIP = false;
-        enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-        enterNewMasterIPEdit.setVisibility(View.GONE);
-        backToListMasterIPBtn = (Button) findViewById(R.id.BACK_TO_LIST_MASTER_IP_BTN);
-        backToListMasterIPBtn.setVisibility(View.GONE);
-        masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        masterIPSpinner.setVisibility(View.VISIBLE);
-        enterNewMasterIPBtn = (Button) findViewById(R.id.NEW_MASTER_IP_BTN);
-        enterNewMasterIPBtn.setVisibility(View.VISIBLE);
+    public void togglePort(View view) {
+        portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
+        enterNewPortBtn = (Button) findViewById(R.id.NEW_PORT_BTN);
+        enterNewPortEdit = (EditText) findViewById(R.id.PORT_EDIT);
+        if(!isNewPort) {
+            isNewPort = true;
+            portSpinner.setVisibility(View.GONE);
+            enterNewPortBtn.setText("Back to list");
+            enterNewPortEdit.setVisibility(View.VISIBLE);
+        }
+        else{
+            isNewPort = false;
+            portSpinner.setVisibility(View.VISIBLE);
+            enterNewPortBtn.setText("Set New Port");
+            enterNewPortEdit.setVisibility(View.GONE);
+        }
     }
 
+    public void toggleNodeIP(View view) {
+        nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
+        enterNewNodeIPBtn = (Button) findViewById(R.id.NEW_NODE_IP_BTN);
+        enterNewNodeIPEdit = (EditText) findViewById(R.id.NODE_IP_EDIT);
+        if(!isNewNodeIP) {
+            isNewNodeIP = true;
+            nodeIPSpinner.setVisibility(View.GONE);
+            enterNewNodeIPBtn.setText("Back to list");
+            enterNewNodeIPEdit.setVisibility(View.VISIBLE);
+        }
+        else{
+            isNewNodeIP = false;
+            nodeIPSpinner.setVisibility(View.VISIBLE);
+            enterNewNodeIPBtn.setText("Set New IP");
+            enterNewNodeIPEdit.setVisibility(View.GONE);
+        }
+    }
+
+    public void toggleRosPrefix(View view) {
+        rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        enterNewRosPrefixBtn = (Button) findViewById(R.id.NEW_ROS_PREFIX_BTN);
+        enterNewRosPrefixEdit = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+        if(!isNewRosPrefix) {
+            isNewRosPrefix = true;
+            rosPrefixSpinner.setVisibility(View.GONE);
+            enterNewRosPrefixBtn.setText("Back to list");
+            enterNewRosPrefixEdit.setVisibility(View.VISIBLE);
+        }
+        else{
+            isNewRosPrefix = false;
+            rosPrefixSpinner.setVisibility(View.VISIBLE);
+            enterNewRosPrefixBtn.setText("Set New Prefix");
+            enterNewRosPrefixEdit.setVisibility(View.GONE);
+        }
+    }
+    public void toggleNewNamespace(View view) {
+        namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+        enterNewNamespaceBtn = (Button) findViewById(R.id.NEW_NAMESPACE_BTN);
+        enterNewNamespaceEdit = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+        if(!isNewNamespace) {
+            isNewNamespace = true;
+            namespaceSpinner.setVisibility(View.GONE);
+            enterNewNamespaceBtn.setText("Back to list");
+            enterNewNamespaceEdit.setVisibility(View.VISIBLE);
+        }
+        else{
+            isNewNamespace = false;
+            namespaceSpinner.setVisibility(View.VISIBLE);
+            enterNewNamespaceBtn.setText("Set New Namespace");
+            enterNewNamespaceEdit.setVisibility(View.GONE);
+        }
+    }
 }

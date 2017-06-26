@@ -25,18 +25,11 @@
             android:inputType="textUri"
             android:text="@string/edit_new_master_prefix" />
         <Button
-            android:id="@+id/NEW_MASTER_PREFIX_BTN"
+            android:id="@+id/TOGGLE_MASTER_PREFIX_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewMasterPrefix"
-            android:text="@string/button_new_master_prefix" />
-        <Button
-            android:id="@+id/BACK_TO_LIST_MASTER_PREFIX_BTN"
-            android:visibility = "gone"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="backToListMasterPrefix"
-            android:text="@string/button_back_to_list_master_prefix" />
+            android:onClick="toggleMasterPrefix"
+            android:text="@string/button_toggle_master_prefix" />
     </TableRow>
 
     <TableRow
@@ -65,15 +58,8 @@
             android:id="@+id/NEW_MASTER_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewMasterIP"
-            android:text="@string/button_new_master_ip" />
-        <Button
-            android:id="@+id/BACK_TO_LIST_MASTER_IP_BTN"
-            android:visibility = "gone"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="backToListMasterIP"
-            android:text="@string/button_back_to_list_master_ip" />
+            android:onClick="toggleMasterIP"
+            android:text="@string/button_toggle_master_ip" />
     </TableRow>
 
     <TableRow
@@ -102,15 +88,8 @@
             android:id="@+id/NEW_PORT_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewPort"
-            android:text="@string/button_new_port" />
-        <Button
-            android:id="@+id/BACK_TO_LIST_PORT_BTN"
-            android:visibility = "gone"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="backToListPort"
-            android:text="@string/button_back_to_list_port" />
+            android:onClick="togglePort"
+            android:text="@string/button_toggle_port" />
     </TableRow>
 
     <TableRow
@@ -139,15 +118,8 @@
             android:id="@+id/NEW_NODE_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewNodeIP"
-            android:text="@string/button_new_node_ip" />
-        <Button
-            android:id="@+id/BACK_TO_LIST_NODE_IP_BTN"
-            android:visibility = "gone"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="backToListNodeIP"
-            android:text="@string/button_back_to_list_node_ip" />
+            android:onClick="toggleNodeIP"
+            android:text="@string/button_toggle_node_ip" />
     </TableRow>
 
     <TableRow
@@ -176,15 +148,8 @@
             android:id="@+id/NEW_ROS_PREFIX_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNeRosPrefix"
-            android:text="@string/button_new_ros_prefix" />
-        <Button
-            android:id="@+id/BACK_TO_LIST_ROS_PREFIX_BTN"
-            android:visibility = "gone"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="backToListRosPrefix"
-            android:text="@string/button_back_to_list_ros_prefix"  />
+            android:onClick="toggleRosPrefix"
+            android:text="@string/button_toggle_ros_prefix" />
     </TableRow>
 
     <TableRow
@@ -213,15 +178,8 @@
             android:id="@+id/NEW_NAMESPACE_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enterNewNamespace"
-            android:text="@string/button_new_namespace" />
-        <Button
-            android:id="@+id/BACK_TO_LIST_NAMESPACE_BTN"
-            android:visibility = "gone"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="backToListNamespace"
-            android:text="@string/button_back_to_list_namespace" />
+            android:onClick="toggleNewNamespace"
+            android:text="@string/button_toggle_namespace" />
     </TableRow>
 
     <TableRow
