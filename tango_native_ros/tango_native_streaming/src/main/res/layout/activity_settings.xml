@@ -55,7 +55,7 @@
             android:inputType="textUri"
             android:text="@string/edit_new_master_ip" />
         <Button
-            android:id="@+id/NEW_MASTER_IP_BTN"
+            android:id="@+id/TOGGLE_MASTER_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="toggleMasterIP"
@@ -85,7 +85,7 @@
             android:inputType="textUri"
             android:text="@string/edit_new_port" />
         <Button
-            android:id="@+id/NEW_PORT_BTN"
+            android:id="@+id/TOGGLE_PORT_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="togglePort"
@@ -115,7 +115,7 @@
             android:inputType="textUri"
             android:text="@string/edit_new_node_ip" />
         <Button
-            android:id="@+id/NEW_NODE_IP_BTN"
+            android:id="@+id/TOGGLE_NODE_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="toggleNodeIP"
@@ -145,7 +145,7 @@
             android:inputType="textUri"
             android:text="@string/edit_new_ros_prefix" />
         <Button
-            android:id="@+id/NEW_ROS_PREFIX_BTN"
+            android:id="@+id/TOGGLE_ROS_PREFIX_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="toggleRosPrefix"
@@ -175,7 +175,7 @@
             android:inputType="textUri"
             android:text="@string/edit_new_namespace" />
         <Button
-            android:id="@+id/NEW_NAMESPACE_BTN"
+            android:id="@+id/TOGGLE_NAMESPACE_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="toggleNewNamespace"

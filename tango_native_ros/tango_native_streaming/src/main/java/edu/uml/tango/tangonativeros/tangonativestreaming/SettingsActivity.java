@@ -212,7 +212,7 @@ public class SettingsActivity extends Activity {
 //TODO: Use "STRING_NAME" + "STRING_TYPE" for ids and prints
     public void toggleMasterPrefix(View view) {
         masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        enterNewMasterPrefixBtn = (Button) findViewById(R.id.NEW_MASTER_PREFIX_BTN);
+        enterNewMasterPrefixBtn = (Button) findViewById(R.id.TOGGLE_MASTER_PREFIX_BTN);
         enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
         if(!isNewMasterPrefix) {
             isNewMasterPrefix = true;
@@ -230,7 +230,7 @@ public class SettingsActivity extends Activity {
 
     public void toggleMasterIP(View view) {
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        enterNewMasterIPBtn = (Button) findViewById(R.id.NEW_MASTER_IP_BTN);
+        enterNewMasterIPBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
         enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
        if(!isNewMasterIP) {
            isNewMasterIP = true;
@@ -248,7 +248,7 @@ public class SettingsActivity extends Activity {
 
     public void togglePort(View view) {
         portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
-        enterNewPortBtn = (Button) findViewById(R.id.NEW_PORT_BTN);
+        enterNewPortBtn = (Button) findViewById(R.id.TOGGLE_PORT_BTN);
         enterNewPortEdit = (EditText) findViewById(R.id.PORT_EDIT);
         if(!isNewPort) {
             isNewPort = true;
@@ -266,7 +266,7 @@ public class SettingsActivity extends Activity {
 
     public void toggleNodeIP(View view) {
         nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
-        enterNewNodeIPBtn = (Button) findViewById(R.id.NEW_NODE_IP_BTN);
+        enterNewNodeIPBtn = (Button) findViewById(R.id.TOGGLE_NODE_IP_BTN);
         enterNewNodeIPEdit = (EditText) findViewById(R.id.NODE_IP_EDIT);
         if(!isNewNodeIP) {
             isNewNodeIP = true;
@@ -284,7 +284,7 @@ public class SettingsActivity extends Activity {
 
     public void toggleRosPrefix(View view) {
         rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-        enterNewRosPrefixBtn = (Button) findViewById(R.id.NEW_ROS_PREFIX_BTN);
+        enterNewRosPrefixBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
         enterNewRosPrefixEdit = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
         if(!isNewRosPrefix) {
             isNewRosPrefix = true;
@@ -301,7 +301,7 @@ public class SettingsActivity extends Activity {
     }
     public void toggleNewNamespace(View view) {
         namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-        enterNewNamespaceBtn = (Button) findViewById(R.id.NEW_NAMESPACE_BTN);
+        enterNewNamespaceBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
         enterNewNamespaceEdit = (EditText) findViewById(R.id.NAMESPACE_EDIT);
         if(!isNewNamespace) {
             isNewNamespace = true;
