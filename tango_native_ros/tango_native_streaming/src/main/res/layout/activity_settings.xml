@@ -21,7 +21,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="7"
+            android:ems="8"
             android:inputType="textUri"
             android:text="@string/edit_new_master_prefix" />
         <Button
@@ -51,7 +51,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="7"
+            android:ems="8"
             android:inputType="textUri"
             android:text="@string/edit_new_master_ip" />
         <Button
@@ -81,7 +81,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="7"
+            android:ems="8"
             android:inputType="textUri"
             android:text="@string/edit_new_port" />
         <Button
@@ -111,7 +111,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="7"
+            android:ems="8"
             android:inputType="textUri"
             android:text="@string/edit_new_node_ip" />
         <Button
@@ -141,7 +141,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="7"
+            android:ems="8"
             android:inputType="textUri"
             android:text="@string/edit_new_ros_prefix" />
         <Button
@@ -171,7 +171,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="7"
+            android:ems="8"
             android:inputType="textUri"
             android:text="@string/edit_new_namespace" />
         <Button
