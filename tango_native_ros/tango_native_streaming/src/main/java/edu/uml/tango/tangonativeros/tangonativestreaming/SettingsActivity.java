@@ -11,6 +11,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -56,8 +59,6 @@ public class SettingsActivity extends Activity {
     private EditText enterNewNamespaceEdit;
     private Button enterNewNamespaceBtn;
 
-    private List<String> str = new ArrayList<String>();
-    private List<String> revStr = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +110,42 @@ public class SettingsActivity extends Activity {
 
         tango_namespace_edit.setText(namespace);
 
+        List<String> masterPrefixData = readFile("previousDataMasterPrefix");
+        List<String> masterIPData = readFile("previousDataMasterIP");
+        List<String> portData = readFile("previousDataPort");
+        List<String> rosIPData = readFile("previousDataRosIP");
+        List<String> rosPrefixData = readFile("previousDataRosPrefix");
+        List<String> namespaceData = readFile("previousDataNamespace");
+
         masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, revStr);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        masterPrefixSpinner.setAdapter(adapter);
+        ArrayAdapter<String> adapterMasterPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, masterPrefixData);
+        adapterMasterPrefix.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        masterPrefixSpinner.setAdapter(adapterMasterPrefix);
+
+        masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+        ArrayAdapter<String> adapterMasterIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, masterIPData);
+        adapterMasterIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        masterIPSpinner.setAdapter(adapterMasterIP);
+
+        portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
+        ArrayAdapter<String> adapterPort = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, portData);
+        adapterPort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        portSpinner.setAdapter(adapterPort);
+
+        nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
+        ArrayAdapter<String> adapterNodeIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rosIPData);
+        adapterNodeIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        nodeIPSpinner.setAdapter(adapterNodeIP);
+
+        rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        ArrayAdapter<String> adapterRosPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rosPrefixData);
+        adapterRosPrefix.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rosPrefixSpinner.setAdapter(adapterRosPrefix);
+
+        namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+        ArrayAdapter<String> adapterNamespace = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namespaceData);
+        adapterNamespace.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        namespaceSpinner.setAdapter(adapterNamespace);
     }
 
     @Override
@@ -315,5 +348,31 @@ public class SettingsActivity extends Activity {
             enterNewNamespaceBtn.setText("Set New Namespace");
             enterNewNamespaceEdit.setVisibility(View.GONE);
         }
+    }
+
+    public List<String> readFile(String fileName){
+        List<String> str = new ArrayList<String>();
+        List<String> revStr = new ArrayList<String>();
+
+        String line;
+        int index;
+        try {
+            FileInputStream fis = openFileInput(fileName);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            line = in.readLine();
+            while (line != null) {
+                str.add(line);
+                line = in.readLine();
+            }
+            in.close();
+            fis.close();
+        }
+        catch (Throwable t) {
+        }
+        //Reverse str so that the most recent IP is on top
+        for(index = str.size() - 1; index >= 0; index--){
+            revStr.add(str.get(index));
+        }
+        return revStr;
     }
 }
