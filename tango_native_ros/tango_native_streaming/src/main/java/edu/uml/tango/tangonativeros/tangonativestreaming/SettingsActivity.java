@@ -27,25 +27,16 @@ import java.util.List;
 
 public class SettingsActivity extends Activity {
 
-    public static String ros_master = "http://10.0.7.172:11311",
+    public static String ros_master = "",
                          ros_ip = "",
-                         tango_prefix = "tango_brain_0/",
-                         namespace = "tango_brain_0";
+                         tango_prefix = "",
+                         namespace = "";
     public TextView ros_master_edit, tango_addr_edit, prefix_edit, tango_namespace_edit, err_no_master;
-    private boolean isNewMasterPrefix = false;
-    private Spinner masterPrefixSpinner;
-    private EditText enterNewMasterPrefixEdit;
-    private Button enterNewMasterPrefixBtn;
 
     private boolean isNewMasterIP = false;
     private Spinner masterIPSpinner;
     private EditText enterNewMasterIPEdit;
     private Button enterNewMasterIPBtn;
-
-    private boolean isNewPort = false;
-    private Spinner portSpinner;
-    private EditText enterNewPortEdit;
-    private Button enterNewPortBtn;
 
     private boolean isNewNodeIP = false;
     private Spinner nodeIPSpinner;
