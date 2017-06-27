@@ -61,10 +61,10 @@ public class SettingsActivity extends Activity {
     List<String> rosPrefixDataStr;
     List<String> namespaceDataStr;*/
 
-    ToggleUI masterIPComponent = new ToggleUI();
-    ToggleUI rosIPComponent = new ToggleUI();
-    ToggleUI rosPrefixComponent = new ToggleUI();
-    ToggleUI namespaceCompentent = new ToggleUI();
+    ToggleUI masterIPComponent;
+    ToggleUI rosIPComponent;
+    ToggleUI rosPrefixComponent;
+    ToggleUI namespaceCompentent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +80,10 @@ public class SettingsActivity extends Activity {
         if (intent.hasExtra("NAMESPACE"))
             namespace = intent.getStringExtra("NAMESPACE");
 
+        masterIPComponent = new ToggleUI();
+        rosIPComponent = new ToggleUI();
+        rosPrefixComponent = new ToggleUI();
+        namespaceCompentent = new ToggleUI();
 
         ros_ip = getIPAddress(true);
         setContentView(R.layout.activity_settings);
