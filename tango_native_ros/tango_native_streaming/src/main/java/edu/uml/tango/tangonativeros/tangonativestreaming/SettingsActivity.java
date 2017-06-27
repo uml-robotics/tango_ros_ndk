@@ -121,12 +121,12 @@ public class SettingsActivity extends Activity {
 
         tango_namespace_edit.setText(namespace);
 
-        List<String> masterPrefixDataStr = readFile("previousDataMasterPrefix");
-        List<String> masterIPDataStr = readFile("previousDataMasterIP");
-        List<String> portDataStr = readFile("previousDataPort");
-        List<String> rosIPDataStr = readFile("previousDataRosIP");
-        List<String> rosPrefixDataStr = readFile("previousDataRosPrefix");
-        List<String> namespaceDataStr = readFile("previousDataNamespace");
+        masterPrefixDataStr = readFile("previousDataMasterPrefix");
+        masterIPDataStr = readFile("previousDataMasterIP");
+        portDataStr = readFile("previousDataPort");
+        rosIPDataStr = readFile("previousDataRosIP");
+        rosPrefixDataStr = readFile("previousDataRosPrefix");
+        namespaceDataStr = readFile("previousDataNamespace");
 
         masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
         ArrayAdapter<String> adapterMasterPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(masterPrefixDataStr));
@@ -247,7 +247,7 @@ public class SettingsActivity extends Activity {
         else {
             enterNewRosPrefixEdit = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
             tango_prefix = enterNewRosPrefixEdit.getText().toString();
-            writeFile("previousDataRosPrefix", rosPrefixDataStr, tango_prefix);
+           writeFile("previousDataRosPrefix", rosPrefixDataStr, tango_prefix);
         }
 
         if(!isNewNamespace) {
@@ -260,12 +260,12 @@ public class SettingsActivity extends Activity {
             writeFile("previousDataNamespace", namespaceDataStr, namespace);
         }
 
-        Log.d("ROS Master prefix", master_prefix);
-        Log.d("ROS Master IP: ", ros_master);
-        Log.d("ROS port: ", master_port);
-        Log.d("Tango IP: ", ros_ip);
-        Log.d("Tango prefix: ", tango_prefix);
-        Log.d("Tango Namespace: ", namespace);
+        Log.i("ROS Master prefix", master_prefix);
+        Log.i("ROS Master IP: ", ros_master);
+        Log.i("ROS port: ", master_port);
+        Log.i("Tango IP: ", ros_ip);
+        Log.i("Tango prefix: ", tango_prefix);
+        Log.i("Tango Namespace: ", namespace);
 
         intent.putExtra("MASTER_PREFIX", master_prefix);
         intent.putExtra("ROS_MASTER", ros_master);
@@ -453,7 +453,6 @@ public class SettingsActivity extends Activity {
         return revStr;
     }
     public void writeFile(String fileName, List<String> str, String newString){
-        String masterIP_message;
         int index;
 
             //Removes the oldest ip to make space for the new one
