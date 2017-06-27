@@ -58,7 +58,7 @@
             android:id="@+id/TOGGLE_ROS_NODE_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="toggleNodeIP"
+            android:onClick="toggleRosNodeIP"
             android:text="@string/button_toggle_node_ip" />
     </TableRow>
 

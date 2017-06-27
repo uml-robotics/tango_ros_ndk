@@ -26,6 +26,7 @@ import java.util.List;
     //tango_brain_0/
     //tango_brain_0
 //TODO: Make all spinner/file code cleaner
+    //make a spinner class
 
 public class SettingsActivity extends Activity {
     public static String ros_master = "",
@@ -33,8 +34,7 @@ public class SettingsActivity extends Activity {
                          tango_prefix = "",
                          namespace = "";
     public TextView ros_master_edit, tango_addr_edit, prefix_edit, tango_namespace_edit, err_no_master;
-
-    private boolean isNewMasterIP = false;
+    /* private boolean isNewMasterIP = false;
     private Spinner masterIPSpinner;
     private EditText enterNewMasterIPEdit;
     private Button enterNewMasterIPBtn;
@@ -59,7 +59,12 @@ public class SettingsActivity extends Activity {
     List<String> portDataStr;
     List<String> rosIPDataStr;
     List<String> rosPrefixDataStr;
-    List<String> namespaceDataStr;
+    List<String> namespaceDataStr;*/
+
+    ToggleUI masterIPComponent = new ToggleUI();
+    ToggleUI rosIPComponent = new ToggleUI();
+    ToggleUI rosPrefixComponent = new ToggleUI();
+    ToggleUI namespaceCompentent = new ToggleUI();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +108,7 @@ public class SettingsActivity extends Activity {
         prefix_edit.setText(tango_prefix);
 
         tango_namespace_edit.setText(namespace);
-
+        /*
         masterPrefixDataStr = readFile("previousDataMasterPrefix");
         masterIPDataStr = readFile("previousDataMasterIP");
         portDataStr = readFile("previousDataPort");
@@ -129,7 +134,18 @@ public class SettingsActivity extends Activity {
         namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
         ArrayAdapter<String> adapterNamespace = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(namespaceDataStr));
         adapterNamespace.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        namespaceSpinner.setAdapter(adapterNamespace);
+        namespaceSpinner.setAdapter(adapterNamespace);*/
+
+        masterIPComponent.dataStr = masterIPComponent.initData("previousDataMasterIP");
+        rosIPComponent.dataStr = rosIPComponent.initData("previousDataRosIP");
+        rosPrefixComponent.dataStr = rosPrefixComponent.initData("previousDataRosPrefix");
+        namespaceCompentent.dataStr = namespaceCompentent.initData("previousDataNamespace");
+
+
+        masterIPComponent.initSpinner(R.id.MASTER_IP_SPINNER);
+        rosIPComponent.initSpinner(R.id.ROS_NODE_IP_SPINNER);
+        rosPrefixComponent.initSpinner(R.id.ROS_PREFIX_SPINNER);
+        namespaceCompentent.initSpinner(R.id.NAMESPACE_SPINNER);
     }
 
     @Override
@@ -166,7 +182,11 @@ public class SettingsActivity extends Activity {
     public void startStreaming(View view) {
 
         Intent intent = new Intent(this, NativeStreamingActivity.class);
-
+        ros_master = masterIPComponent.dataFromUser(R.id.MASTER_IP_SPINNER, R.id.MASTER_IP_EDIT);
+        ros_ip = rosIPComponent.dataFromUser(R.id.ROS_NODE_IP_SPINNER, R.id.ROS_NODE_IP_EDIT);
+        tango_prefix = rosPrefixComponent.dataFromUser(R.id.ROS_PREFIX_SPINNER, R.id.ROS_PREFIX_EDIT);
+        namespace = namespaceCompentent.dataFromUser(R.id.NAMESPACE_SPINNER, R.id.NAMESPACE_EDIT);
+        /*
         if(!isNewMasterIP) {
             masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
             ros_master = masterIPSpinner.getSelectedItem().toString();
@@ -177,7 +197,6 @@ public class SettingsActivity extends Activity {
             writeFile("previousDataMasterIP", masterIPDataStr, ros_master);
         }
 
-        //TODO: change node to ros
         if(!isNewRosNodeIP) {
             rosNodeIPSpinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
             ros_ip = rosNodeIPSpinner.getSelectedItem().toString();
@@ -206,7 +225,7 @@ public class SettingsActivity extends Activity {
             enterNewNamespaceEdit = (EditText) findViewById(R.id.NAMESPACE_EDIT);
             namespace = enterNewNamespaceEdit.getText().toString();
             writeFile("previousDataNamespace", namespaceDataStr, namespace);
-        }
+        }*/
 
         Log.d("ROS Master URI: ", ros_master);
         Log.d("Tango IP: ", ros_ip);
@@ -250,23 +269,39 @@ public class SettingsActivity extends Activity {
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
     }
-    
+
+    public void toggleMasterIP(View view) {
+        masterIPComponent.toggleBtns(R.id.MASTER_IP_SPINNER, R.id.TOGGLE_MASTER_IP_BTN, R.id.MASTER_IP_EDIT);
+    }
+
+    public void toggleRosNodeIP(View view) {
+        rosIPComponent.toggleBtns(R.id.ROS_NODE_IP_SPINNER, R.id.TOGGLE_ROS_NODE_IP_BTN, R.id.ROS_NODE_IP_EDIT);
+    }
+
+    public void toggleRosPrefix(View view) {
+        rosPrefixComponent.toggleBtns(R.id.ROS_PREFIX_SPINNER, R.id.TOGGLE_ROS_PREFIX_BTN, R.id.ROS_PREFIX_EDIT);
+    }
+    public void toggleNewNamespace(View view) {
+        namespaceCompentent.toggleBtns(R.id.NAMESPACE_SPINNER, R.id.TOGGLE_NAMESPACE_BTN, R.id.NAMESPACE_EDIT);
+    }
+
+/*
     public void toggleMasterIP(View view) {
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         enterNewMasterIPBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
         enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-       if(!isNewMasterIP) {
-           isNewMasterIP = true;
-           masterIPSpinner.setVisibility(View.GONE);
-           enterNewMasterIPBtn.setText("Back to list");
-           enterNewMasterIPEdit.setVisibility(View.VISIBLE);
-       }
-       else{
-           isNewMasterIP = false;
-           masterIPSpinner.setVisibility(View.VISIBLE);
-           enterNewMasterIPBtn.setText("Set New IP");
-           enterNewMasterIPEdit.setVisibility(View.GONE);
-       }
+        if(!isNewMasterIP) {
+            isNewMasterIP = true;
+            masterIPSpinner.setVisibility(View.GONE);
+            enterNewMasterIPBtn.setText("Back to list");
+            enterNewMasterIPEdit.setVisibility(View.VISIBLE);
+        }
+        else{
+            isNewMasterIP = false;
+            masterIPSpinner.setVisibility(View.VISIBLE);
+            enterNewMasterIPBtn.setText("Set New IP");
+            enterNewMasterIPEdit.setVisibility(View.GONE);
+        }
     }
 
     public void toggleRosNodeIP(View view) {
@@ -321,7 +356,8 @@ public class SettingsActivity extends Activity {
             enterNewNamespaceEdit.setVisibility(View.GONE);
         }
     }
-
+    */
+/*
     public List<String> readFile(String fileName){
         List<String> str = new ArrayList<String>();
         String line;
@@ -341,7 +377,7 @@ public class SettingsActivity extends Activity {
         }
         return str;
     }
-    
+
     public List<String> reverseStr(List<String> str){
         List<String> revStr = new ArrayList<String>();
         int index;
@@ -374,4 +410,5 @@ public class SettingsActivity extends Activity {
 
             }
         }
+        */
 }
