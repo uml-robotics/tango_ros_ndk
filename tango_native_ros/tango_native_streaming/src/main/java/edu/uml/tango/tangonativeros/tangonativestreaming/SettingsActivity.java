@@ -260,12 +260,12 @@ public class SettingsActivity extends Activity {
             writeFile("previousDataNamespace", namespaceDataStr, namespace);
         }
 
-        Log.i("ROS Master prefix", master_prefix);
-        Log.i("ROS Master IP: ", ros_master);
-        Log.i("ROS port: ", master_port);
-        Log.i("Tango IP: ", ros_ip);
-        Log.i("Tango prefix: ", tango_prefix);
-        Log.i("Tango Namespace: ", namespace);
+        Log.d("ROS Master prefix", master_prefix);
+        Log.d("ROS Master IP: ", ros_master);
+        Log.d("ROS port: ", master_port);
+        Log.d("Tango IP: ", ros_ip);
+        Log.d("Tango prefix: ", tango_prefix);
+        Log.d("Tango Namespace: ", namespace);
 
         intent.putExtra("MASTER_PREFIX", master_prefix);
         intent.putExtra("ROS_MASTER", ros_master);
