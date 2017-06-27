@@ -61,10 +61,10 @@ public class SettingsActivity extends Activity {
     List<String> rosPrefixDataStr;
     List<String> namespaceDataStr;*/
 
-    ToggleUI masterIPComponent;
-    ToggleUI rosIPComponent;
-    ToggleUI rosPrefixComponent;
-    ToggleUI namespaceCompentent;
+    ToggleUI masterIPComponent = new ToggleUI();
+    ToggleUI rosIPComponent = new ToggleUI();
+    ToggleUI rosPrefixComponent = new ToggleUI();
+    ToggleUI namespaceCompentent = new ToggleUI();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +80,6 @@ public class SettingsActivity extends Activity {
         if (intent.hasExtra("NAMESPACE"))
             namespace = intent.getStringExtra("NAMESPACE");
 
-        masterIPComponent = new ToggleUI();
-        rosIPComponent = new ToggleUI();
-        rosPrefixComponent = new ToggleUI();
-        namespaceCompentent = new ToggleUI();
 
         ros_ip = getIPAddress(true);
         setContentView(R.layout.activity_settings);
@@ -140,16 +136,31 @@ public class SettingsActivity extends Activity {
         adapterNamespace.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         namespaceSpinner.setAdapter(adapterNamespace);*/
 
-        masterIPComponent.dataStr = masterIPComponent.initData("previousDataMasterIP");
-        rosIPComponent.dataStr = rosIPComponent.initData("previousDataRosIP");
-        rosPrefixComponent.dataStr = rosPrefixComponent.initData("previousDataRosPrefix");
-        namespaceCompentent.dataStr = namespaceCompentent.initData("previousDataNamespace");
+        masterIPComponent.initData("previousDataMasterIP");
+        rosIPComponent.initData("previousDataRosIP");
+        rosPrefixComponent.initData("previousDataRosPrefix");
+        namespaceCompentent.initData("previousDataNamespace");
 
+        //TODO: Move this to the class if possible?
+        masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
 
-        masterIPComponent.initSpinner(R.id.MASTER_IP_SPINNER);
-        rosIPComponent.initSpinner(R.id.ROS_NODE_IP_SPINNER);
-        rosPrefixComponent.initSpinner(R.id.ROS_PREFIX_SPINNER);
-        namespaceCompentent.initSpinner(R.id.NAMESPACE_SPINNER);
+        masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+        namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+
+        masterIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
+        rosPrefixComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
+        rosPrefixComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
+        namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
+
+        masterIPComponent.initSpinner(this);
+        rosIPComponent.initSpinner(this);
+        rosPrefixComponent.initSpinner(this);
+        namespaceCompentent.initSpinner(this);
     }
 
     @Override
@@ -186,10 +197,10 @@ public class SettingsActivity extends Activity {
     public void startStreaming(View view) {
 
         Intent intent = new Intent(this, NativeStreamingActivity.class);
-        ros_master = masterIPComponent.dataFromUser(R.id.MASTER_IP_SPINNER, R.id.MASTER_IP_EDIT);
-        ros_ip = rosIPComponent.dataFromUser(R.id.ROS_NODE_IP_SPINNER, R.id.ROS_NODE_IP_EDIT);
-        tango_prefix = rosPrefixComponent.dataFromUser(R.id.ROS_PREFIX_SPINNER, R.id.ROS_PREFIX_EDIT);
-        namespace = namespaceCompentent.dataFromUser(R.id.NAMESPACE_SPINNER, R.id.NAMESPACE_EDIT);
+        ros_master = masterIPComponent.dataFromUser();
+        ros_ip = rosIPComponent.dataFromUser();
+        tango_prefix = rosPrefixComponent.dataFromUser();
+        namespace = namespaceCompentent.dataFromUser();
         /*
         if(!isNewMasterIP) {
             masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
@@ -275,18 +286,18 @@ public class SettingsActivity extends Activity {
     }
 
     public void toggleMasterIP(View view) {
-        masterIPComponent.toggleBtns(R.id.MASTER_IP_SPINNER, R.id.TOGGLE_MASTER_IP_BTN, R.id.MASTER_IP_EDIT);
+        masterIPComponent.toggleBtns();
     }
 
     public void toggleRosNodeIP(View view) {
-        rosIPComponent.toggleBtns(R.id.ROS_NODE_IP_SPINNER, R.id.TOGGLE_ROS_NODE_IP_BTN, R.id.ROS_NODE_IP_EDIT);
+        rosIPComponent.toggleBtns();
     }
 
     public void toggleRosPrefix(View view) {
-        rosPrefixComponent.toggleBtns(R.id.ROS_PREFIX_SPINNER, R.id.TOGGLE_ROS_PREFIX_BTN, R.id.ROS_PREFIX_EDIT);
+        rosPrefixComponent.toggleBtns();
     }
     public void toggleNewNamespace(View view) {
-        namespaceCompentent.toggleBtns(R.id.NAMESPACE_SPINNER, R.id.TOGGLE_NAMESPACE_BTN, R.id.NAMESPACE_EDIT);
+        namespaceCompentent.toggleBtns();
     }
 
 /*

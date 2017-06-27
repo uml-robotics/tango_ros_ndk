@@ -22,35 +22,35 @@ public class ToggleUI extends SettingsActivity  {
     List<String> dataStr;
     String fileName;
 
-    public void initSpinner(int id){
-        spinner = (Spinner) findViewById(id);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(dataStr));
+    public void initSpinner(Context context){
+        //spinner = (Spinner) findViewById(id);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseStr(dataStr));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
 
-    public List<String> initData(String fileName){
-        return readFile(fileName);
+    public void initData(String fileName){
+        readFile(fileName);
     }
 
-    public String dataFromUser(int idSpinner, int idEditTxt){
+    public String dataFromUser(){
         String newdata;
         if(!isNew) {
-            spinner = (Spinner) findViewById(idSpinner);
+            //spinner = (Spinner) findViewById(idSpinner);
             return spinner.getSelectedItem().toString();
         }
         else {
-            editTxt = (EditText) findViewById(idEditTxt);
+            //editTxt = (EditText) findViewById(idEditTxt);
             newdata = editTxt.getText().toString();
             writeFile(fileName, dataStr, newdata);
             return newdata;
         }
     }
 
-    public void toggleBtns(int idSpinner, int idBtn, int idEdt){
-        spinner = (Spinner) findViewById(idSpinner);
-        toggleBtn = (Button) findViewById(idBtn);
-        editTxt = (EditText) findViewById(idEdt);
+    public void toggleBtns(){
+        //spinner = (Spinner) findViewById(idSpinner);
+        //toggleBtn = (Button) findViewById(idBtn);
+        //editTxt = (EditText) findViewById(idEdt);
         if(!isNew) {
             isNew = true;
             spinner.setVisibility(View.GONE);
@@ -76,8 +76,8 @@ public class ToggleUI extends SettingsActivity  {
         return revStr;
     }
 
-    public List<String> readFile(String fileName){
-        List<String> str = new ArrayList<String>();
+    public void readFile(String fileName){
+        dataStr = new ArrayList<String>();
         String line;
 
         try {
@@ -85,7 +85,7 @@ public class ToggleUI extends SettingsActivity  {
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
             line = in.readLine();
             while (line != null) {
-                str.add(line);
+                dataStr.add(line);
                 line = in.readLine();
             }
             in.close();
@@ -93,7 +93,6 @@ public class ToggleUI extends SettingsActivity  {
         }
         catch (Throwable t) {
         }
-        return str;
     }
 
     public void writeFile(String fileName, List<String> str, String newString){
