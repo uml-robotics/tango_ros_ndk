@@ -54,6 +54,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 
 /**
@@ -146,13 +147,8 @@ public class NativeStreamingActivity extends Activity {
             Intent intent = getIntent();
             startActivity(intent);
             finish();
-            System.exit(0);
+            //System.exit(0);
         } else {
-
-        if (nativeError) {
-            setResult(RESULT_CANCELED);
-            finish();
-        }
 
             super.onResume();
 
@@ -166,6 +162,12 @@ public class NativeStreamingActivity extends Activity {
             }
             bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
             TangoJniNative.onResume(this);
+
+            if (nativeError) {
+                TextView msg = (TextView) findViewById(R.id.STREAM_STATE_LBL);
+                msg.setText(R.string.STREAM_ERR);
+                //finish();
+            }
         }
     }
 

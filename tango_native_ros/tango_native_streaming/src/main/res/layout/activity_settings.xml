@@ -4,18 +4,6 @@
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <TextView
-            android:id="@+id/ERR_NO_MASTER_LBL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ERR_NO_MASTER_LBL"
-            android:visibility="gone" />
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
@@ -138,5 +126,12 @@
             android:layout_height="wrap_content"
             android:onClick="startStreaming"
             android:text="@string/START_BTN" />
+
+        <TextView
+            android:id="@+id/ERR_NO_MASTER_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ERR_NO_MASTER_LBL"
+            android:visibility="invisible" />
     </TableRow>
 </TableLayout>

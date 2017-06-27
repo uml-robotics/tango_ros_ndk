@@ -129,7 +129,7 @@ public class SettingsActivity extends Activity {
         intent.putExtra("ROS_IP", ros_ip);
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
-        startActivityForResult(intent, 0);
+        startActivity(intent);
 //        finish();
     }
 
@@ -171,17 +171,6 @@ public class SettingsActivity extends Activity {
         tango_addr_edit.setText(ros_ip);
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0) {
-            if (resultCode == RESULT_CANCELED) {
-                err_no_master.setVisibility(View.VISIBLE);
-            } else {
-                err_no_master.setVisibility(View.GONE);
-            }
-        }
     }
 
 }
