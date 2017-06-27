@@ -4,36 +4,6 @@
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/ROS_MASTER_PREFIX_LBL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ROS_MASTER_PREFIX_LBL" />
-        <Spinner
-            android:id="@+id/MASTER_PREFIX_SPINNER"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"/>
-        <EditText
-            android:id="@+id/MASTER_PREFIX_EDIT"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="8"
-            android:inputType="textUri"
-            android:text="@string/edit_new_master_prefix" />
-        <Button
-            android:id="@+id/TOGGLE_MASTER_PREFIX_BTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="toggleMasterPrefix"
-            android:text="@string/button_toggle_master_prefix" />
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
         <TextView
@@ -60,36 +30,6 @@
             android:layout_height="wrap_content"
             android:onClick="toggleMasterIP"
             android:text="@string/button_toggle_master_ip" />
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <TextView
-            android:id="@+id/ROS_PORT_LBL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ROS_PORT_LBL" />
-        <Spinner
-            android:id="@+id/PORT_SPINNER"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"/>
-        <EditText
-            android:id="@+id/PORT_EDIT"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="8"
-            android:inputType="textUri"
-            android:text="@string/edit_new_port" />
-        <Button
-            android:id="@+id/TOGGLE_PORT_BTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="togglePort"
-            android:text="@string/button_toggle_port" />
     </TableRow>
 
     <TableRow
@@ -192,5 +132,12 @@
             android:layout_height="wrap_content"
             android:onClick="startStreaming"
             android:text="@string/START_BTN" />
+
+        <TextView
+            android:id="@+id/ERR_NO_MASTER_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ERR_NO_MASTER_LBL"
+            android:visibility="invisible" />
     </TableRow>
 </TableLayout>

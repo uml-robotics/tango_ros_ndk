@@ -3,12 +3,13 @@
     <string name="app_name">Tango Native ROS Streaming</string>
     <string name="app_name_long">Tango Native ROS (Pose and Depth) Streaming</string>
     <string name="text_message">Started Streaming!</string>
-    <string name="ROS_MASTER_LBL">ROS Master IPv4 Address</string>
+    <string name="ROS_MASTER_LBL">ROS Master URI</string>
     <string name="ROS_NODE_LBL">ROS Node IPv4 Address</string>
     <string name="ROS_PREFIX_LBL">ROS Prefix</string>
     <string name="ROS_NAMESPACE_LBL">ROS Namespace</string>
     <string name="START_BTN">Start ROS Node</string>
     <string name="tango_addr_error">Unable to determine IP Address</string>
+
     <string name="STOP_BTN">Stop Streaming</string>
     <string name="ROS_PORT_LBL">Port</string>
     <string name="ROS_MASTER_PREFIX_LBL">ROS Master Prefix</string>
@@ -30,4 +31,8 @@
 
     <string name="edit_new_namespace">Enter New Namespace</string>
     <string name="button_toggle_namespace">Set New Namespace</string>
+
+    <string name="ERR_NO_MASTER_LBL">Error: No ROS Master found</string>
+    <string name="STREAM_ERR">Error: Unable to contact ROS master</string>
+
 </resources>
