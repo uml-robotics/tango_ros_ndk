@@ -112,7 +112,7 @@ public class NativeStreamingActivity extends Activity {
 
     boolean hasConfigChanged() {
         boolean restart = false;
-        if (ros_master_jstr != null || ros_master != null || ros_ip_jstr != null || ros_ip != null || tango_prefix_jstr != null || tango_prefix != null || namespace_jstr != null || namespace != null) {
+        if (ros_master_jstr != null && ros_master != null && ros_ip_jstr != null && ros_ip != null && tango_prefix_jstr != null && tango_prefix != null && namespace_jstr != null && namespace != null) {
             restart = (!ros_master_jstr.equals(ros_master)) || (!ros_ip_jstr.equals(ros_ip)) || (!tango_prefix_jstr.equals(tango_prefix)) || (!namespace_jstr.equals(namespace));
         }
         return restart;
