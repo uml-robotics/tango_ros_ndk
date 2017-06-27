@@ -34,16 +34,16 @@ public class ToggleUI extends SettingsActivity  {
     }
 
     public String dataFromUser(){
-        String newdata;
+        String newData;
         if(!isNew) {
             //spinner = (Spinner) findViewById(idSpinner);
             return spinner.getSelectedItem().toString();
         }
         else {
             //editTxt = (EditText) findViewById(idEditTxt);
-            newdata = editTxt.getText().toString();
-            writeFile(fileName, dataStr, newdata);
-            return newdata;
+            newData = editTxt.getText().toString();
+            writeFile(fileName, dataStr, newData);
+            return newData;
         }
     }
 
