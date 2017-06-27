@@ -191,12 +191,6 @@ public class SettingsActivity extends Activity {
         return "";
     }
     public void startStreaming(View view) {
-        /*master_prefix = ros_master_prefix_edit.getText().toString();
-        ros_master = ros_master_edit.getText().toString();
-        master_port = ros_port_edit.getText().toString();
-        ros_ip = tango_addr_edit.getText().toString();
-        tango_prefix = prefix_edit.getText().toString();
-        namespace = tango_namespace_edit.getText().toString();*/
 
         Intent intent = new Intent(this, NativeStreamingActivity.class);
 
@@ -443,15 +437,17 @@ public class SettingsActivity extends Activity {
         }
         return str;
     }
+    
     public List<String> reverseStr(List<String> str){
         List<String> revStr = new ArrayList<String>();
         int index;
-        //Reverse str so that the most recent IP is on top
+        //Reverse str so that the most recent IP is on top of spinner
         for(index = str.size() - 1; index >= 0; index--){
             revStr.add(str.get(index));
         }
         return revStr;
     }
+
     public void writeFile(String fileName, List<String> str, String newString){
         int index;
 
