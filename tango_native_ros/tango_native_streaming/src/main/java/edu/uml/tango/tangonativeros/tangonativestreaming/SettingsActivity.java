@@ -1,6 +1,7 @@
 package edu.uml.tango.tangonativeros.tangonativestreaming;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,12 +14,16 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+//TODO: Remove hardcode defaults except rosip
+//TODO: Make all spinner/file code cleaner
 
 public class SettingsActivity extends Activity {
 
@@ -59,6 +64,12 @@ public class SettingsActivity extends Activity {
     private EditText enterNewNamespaceEdit;
     private Button enterNewNamespaceBtn;
 
+    List<String> masterPrefixDataStr;
+    List<String> masterIPDataStr;
+    List<String> portDataStr;
+    List<String> rosIPDataStr;
+    List<String> rosPrefixDataStr;
+    List<String> namespaceDataStr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,40 +121,40 @@ public class SettingsActivity extends Activity {
 
         tango_namespace_edit.setText(namespace);
 
-        List<String> masterPrefixData = readFile("previousDataMasterPrefix");
-        List<String> masterIPData = readFile("previousDataMasterIP");
-        List<String> portData = readFile("previousDataPort");
-        List<String> rosIPData = readFile("previousDataRosIP");
-        List<String> rosPrefixData = readFile("previousDataRosPrefix");
-        List<String> namespaceData = readFile("previousDataNamespace");
+        List<String> masterPrefixDataStr = readFile("previousDataMasterPrefix");
+        List<String> masterIPDataStr = readFile("previousDataMasterIP");
+        List<String> portDataStr = readFile("previousDataPort");
+        List<String> rosIPDataStr = readFile("previousDataRosIP");
+        List<String> rosPrefixDataStr = readFile("previousDataRosPrefix");
+        List<String> namespaceDataStr = readFile("previousDataNamespace");
 
         masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        ArrayAdapter<String> adapterMasterPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, masterPrefixData);
+        ArrayAdapter<String> adapterMasterPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(masterPrefixDataStr));
         adapterMasterPrefix.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         masterPrefixSpinner.setAdapter(adapterMasterPrefix);
 
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        ArrayAdapter<String> adapterMasterIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, masterIPData);
+        ArrayAdapter<String> adapterMasterIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(masterIPDataStr));
         adapterMasterIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         masterIPSpinner.setAdapter(adapterMasterIP);
 
         portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
-        ArrayAdapter<String> adapterPort = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, portData);
+        ArrayAdapter<String> adapterPort = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(portDataStr));
         adapterPort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         portSpinner.setAdapter(adapterPort);
 
         nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
-        ArrayAdapter<String> adapterNodeIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rosIPData);
+        ArrayAdapter<String> adapterNodeIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosIPDataStr));
         adapterNodeIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         nodeIPSpinner.setAdapter(adapterNodeIP);
 
         rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-        ArrayAdapter<String> adapterRosPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rosPrefixData);
+        ArrayAdapter<String> adapterRosPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosPrefixDataStr));
         adapterRosPrefix.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         rosPrefixSpinner.setAdapter(adapterRosPrefix);
 
         namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-        ArrayAdapter<String> adapterNamespace = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namespaceData);
+        ArrayAdapter<String> adapterNamespace = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(namespaceDataStr));
         adapterNamespace.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         namespaceSpinner.setAdapter(adapterNamespace);
     }
@@ -180,19 +191,82 @@ public class SettingsActivity extends Activity {
         return "";
     }
     public void startStreaming(View view) {
-        master_prefix = ros_master_prefix_edit.getText().toString();
+        /*master_prefix = ros_master_prefix_edit.getText().toString();
         ros_master = ros_master_edit.getText().toString();
         master_port = ros_port_edit.getText().toString();
         ros_ip = tango_addr_edit.getText().toString();
         tango_prefix = prefix_edit.getText().toString();
-        namespace = tango_namespace_edit.getText().toString();
+        namespace = tango_namespace_edit.getText().toString();*/
+
+        Intent intent = new Intent(this, NativeStreamingActivity.class);
+
+        if(!isNewMasterIP) {
+            masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+            ros_master = masterIPSpinner.getSelectedItem().toString();
+        }
+        else {
+            enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+            ros_master = enterNewMasterIPEdit.getText().toString();
+            writeFile("previousDataMasterIP", masterIPDataStr, ros_master);
+        }
+
+        if(!isNewMasterPrefix) {
+            masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
+            master_prefix = masterPrefixSpinner.getSelectedItem().toString();
+        }
+        else {
+            enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
+            master_prefix = enterNewMasterPrefixEdit.getText().toString();
+            writeFile("previousDataMasterPrefix", masterPrefixDataStr, master_prefix);
+        }
+
+        if(!isNewPort) {
+            portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
+            master_port = portSpinner.getSelectedItem().toString();
+        }
+        else {
+            enterNewPortEdit = (EditText) findViewById(R.id.PORT_EDIT);
+            master_port = enterNewPortEdit.getText().toString();
+            writeFile("previousDataPort", portDataStr, master_port);
+        }
+        //TODO: change node to ros
+        if(!isNewNodeIP) {
+            nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
+            ros_ip = nodeIPSpinner.getSelectedItem().toString();
+        }
+        else {
+            enterNewNodeIPEdit = (EditText) findViewById(R.id.NODE_IP_EDIT);
+            ros_ip = enterNewNodeIPEdit.getText().toString();
+            writeFile("previousDataRosIP", rosIPDataStr, ros_ip);
+        }
+
+        if(!isNewRosPrefix) {
+            rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+            tango_prefix = rosPrefixSpinner.getSelectedItem().toString();
+        }
+        else {
+            enterNewRosPrefixEdit = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+            tango_prefix = enterNewRosPrefixEdit.getText().toString();
+            writeFile("previousDataRosPrefix", rosPrefixDataStr, tango_prefix);
+        }
+
+        if(!isNewNamespace) {
+            namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+            namespace = namespaceSpinner.getSelectedItem().toString();
+        }
+        else {
+            enterNewNamespaceEdit = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+            namespace = enterNewNamespaceEdit.getText().toString();
+            writeFile("previousDataNamespace", namespaceDataStr, namespace);
+        }
+
         Log.d("ROS Master prefix", master_prefix);
         Log.d("ROS Master IP: ", ros_master);
         Log.d("ROS port: ", master_port);
         Log.d("Tango IP: ", ros_ip);
         Log.d("Tango prefix: ", tango_prefix);
         Log.d("Tango Namespace: ", namespace);
-        Intent intent = new Intent(this, NativeStreamingActivity.class);
+
         intent.putExtra("MASTER_PREFIX", master_prefix);
         intent.putExtra("ROS_MASTER", ros_master);
         intent.putExtra("MASTER_PORT", master_port);
@@ -352,10 +426,8 @@ public class SettingsActivity extends Activity {
 
     public List<String> readFile(String fileName){
         List<String> str = new ArrayList<String>();
-        List<String> revStr = new ArrayList<String>();
-
         String line;
-        int index;
+
         try {
             FileInputStream fis = openFileInput(fileName);
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
@@ -369,10 +441,38 @@ public class SettingsActivity extends Activity {
         }
         catch (Throwable t) {
         }
+        return str;
+    }
+    public List<String> reverseStr(List<String> str){
+        List<String> revStr = new ArrayList<String>();
+        int index;
         //Reverse str so that the most recent IP is on top
         for(index = str.size() - 1; index >= 0; index--){
             revStr.add(str.get(index));
         }
         return revStr;
     }
+    public void writeFile(String fileName, List<String> str, String newString){
+        String masterIP_message;
+        int index;
+
+            //Removes the oldest ip to make space for the new one
+            while (str.size() >= 5) {
+                str.remove(0);
+            }
+            str.add(newString);
+
+            try {
+                FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+
+                for(index = 0; index < str.size(); index ++) {
+                    fos.write(str.get(index).getBytes());
+                    fos.write(System.getProperty("line.separator").getBytes());
+                }
+                fos.close();
+            }
+            catch (Throwable t) {
+
+            }
+        }
 }
