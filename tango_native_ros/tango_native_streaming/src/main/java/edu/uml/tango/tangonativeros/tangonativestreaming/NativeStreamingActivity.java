@@ -72,6 +72,8 @@ public class NativeStreamingActivity extends Activity {
 
     public boolean nativeError = false;
 
+    public boolean tangoServiceBound = false;
+
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -110,8 +112,8 @@ public class NativeStreamingActivity extends Activity {
 
     boolean hasConfigChanged() {
         boolean restart = false;
-        if (ros_master_jstr != null || ros_ip_jstr != null || tango_prefix_jstr != null || namespace_jstr != null) {
-            restart = (ros_master_jstr != ros_master) || (ros_ip_jstr != ros_ip) || (tango_prefix_jstr != tango_prefix) || (namespace_jstr != namespace);
+        if (ros_master_jstr != null || ros_master != null || ros_ip_jstr != null || ros_ip != null || tango_prefix_jstr != null || tango_prefix != null || namespace_jstr != null || namespace != null) {
+            restart = (!ros_master_jstr.equals(ros_master)) || (!ros_ip_jstr.equals(ros_ip)) || (!tango_prefix_jstr.equals(tango_prefix)) || (!namespace_jstr.equals(namespace));
         }
         return restart;
     }
@@ -131,12 +133,16 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onResume() {
 
+        super.onResume();
+
         needsRestart = hasConfigChanged();
 
         ros_master_jstr = ros_master;
         ros_ip_jstr = ros_ip;
         tango_prefix_jstr = tango_prefix;
         namespace_jstr = namespace;
+
+
 
         if (needsRestart) {
             needsRestart = false;
@@ -145,9 +151,6 @@ public class NativeStreamingActivity extends Activity {
             finish();
             //System.exit(0);
         } else {
-
-            super.onResume();
-
             Intent intent = new Intent();
             intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
             boolean success = (getPackageManager().resolveService(intent, 0) != null);
@@ -157,6 +160,8 @@ public class NativeStreamingActivity extends Activity {
                 intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
             }
             bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
+            tangoServiceBound = true;
+
             TangoJniNative.onResume(this);
 
             if (nativeError) {
@@ -171,7 +176,9 @@ public class NativeStreamingActivity extends Activity {
     protected void onPause() {
         isPaused = isFinishing();
         TangoJniNative.onPause();
-        unbindService(mTangoServiceConnection);
+        if (tangoServiceBound) {
+            unbindService(mTangoServiceConnection);
+        }
         super.onPause();
     }
 
