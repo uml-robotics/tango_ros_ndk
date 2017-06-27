@@ -119,20 +119,10 @@ public class SettingsActivity extends Activity {
         rosPrefixDataStr = readFile("previousDataRosPrefix");
         namespaceDataStr = readFile("previousDataNamespace");
 
-        masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        ArrayAdapter<String> adapterMasterPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(masterPrefixDataStr));
-        adapterMasterPrefix.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        masterPrefixSpinner.setAdapter(adapterMasterPrefix);
-
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         ArrayAdapter<String> adapterMasterIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(masterIPDataStr));
         adapterMasterIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         masterIPSpinner.setAdapter(adapterMasterIP);
-
-        portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
-        ArrayAdapter<String> adapterPort = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(portDataStr));
-        adapterPort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        portSpinner.setAdapter(adapterPort);
 
         nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
         ArrayAdapter<String> adapterNodeIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosIPDataStr));
@@ -269,24 +259,6 @@ public class SettingsActivity extends Activity {
         tango_namespace_edit.setText(namespace);
     }
 //TODO: Use "STRING_NAME" + "STRING_TYPE" for ids and prints
-    public void toggleMasterPrefix(View view) {
-        masterPrefixSpinner = (Spinner) findViewById(R.id.MASTER_PREFIX_SPINNER);
-        enterNewMasterPrefixBtn = (Button) findViewById(R.id.TOGGLE_MASTER_PREFIX_BTN);
-        enterNewMasterPrefixEdit = (EditText) findViewById(R.id.MASTER_PREFIX_EDIT);
-        if(!isNewMasterPrefix) {
-            isNewMasterPrefix = true;
-            masterPrefixSpinner.setVisibility(View.GONE);
-            enterNewMasterPrefixBtn.setText("Back to list");
-            enterNewMasterPrefixEdit.setVisibility(View.VISIBLE);
-        }
-        else {
-            isNewMasterPrefix = false;
-            masterPrefixSpinner.setVisibility(View.VISIBLE);
-            enterNewMasterPrefixBtn.setText("Set New Prefix");
-            enterNewMasterPrefixEdit.setVisibility(View.GONE);
-        }
-    }
-
     public void toggleMasterIP(View view) {
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         enterNewMasterIPBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
@@ -303,24 +275,6 @@ public class SettingsActivity extends Activity {
            enterNewMasterIPBtn.setText("Set New IP");
            enterNewMasterIPEdit.setVisibility(View.GONE);
        }
-    }
-
-    public void togglePort(View view) {
-        portSpinner = (Spinner) findViewById(R.id.PORT_SPINNER);
-        enterNewPortBtn = (Button) findViewById(R.id.TOGGLE_PORT_BTN);
-        enterNewPortEdit = (EditText) findViewById(R.id.PORT_EDIT);
-        if(!isNewPort) {
-            isNewPort = true;
-            portSpinner.setVisibility(View.GONE);
-            enterNewPortBtn.setText("Back to list");
-            enterNewPortEdit.setVisibility(View.VISIBLE);
-        }
-        else{
-            isNewPort = false;
-            portSpinner.setVisibility(View.VISIBLE);
-            enterNewPortBtn.setText("Set New Port");
-            enterNewPortEdit.setVisibility(View.GONE);
-        }
     }
 
     public void toggleNodeIP(View view) {
