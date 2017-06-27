@@ -22,11 +22,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//TODO: Remove hardcode defaults except rosip
+//TODO: if size is 0 then use the defaults for tango_prefix ros_ip and namespace
+    //tango_brain_0/
+    //tango_brain_0
 //TODO: Make all spinner/file code cleaner
 
 public class SettingsActivity extends Activity {
-
     public static String ros_master = "",
                          ros_ip = "",
                          tango_prefix = "",
@@ -38,10 +39,10 @@ public class SettingsActivity extends Activity {
     private EditText enterNewMasterIPEdit;
     private Button enterNewMasterIPBtn;
 
-    private boolean isNewNodeIP = false;
-    private Spinner nodeIPSpinner;
-    private EditText enterNewNodeIPEdit;
-    private Button enterNewNodeIPBtn;
+    private boolean isNewRosNodeIP = false;
+    private Spinner rosNodeIPSpinner;
+    private EditText enterNewRosNodeIPEdit;
+    private Button enterNewRosNodeIPBtn;
 
     private boolean isNewRosPrefix = false;
     private Spinner rosPrefixSpinner;
@@ -79,7 +80,7 @@ public class SettingsActivity extends Activity {
         setContentView(R.layout.activity_settings);
         ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
 
-        tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
+        tango_addr_edit = (TextView) findViewById(R.id.ROS_NODE_IP_EDIT);
         prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
 
@@ -115,10 +116,10 @@ public class SettingsActivity extends Activity {
         adapterMasterIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         masterIPSpinner.setAdapter(adapterMasterIP);
 
-        nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
-        ArrayAdapter<String> adapterNodeIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosIPDataStr));
-        adapterNodeIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        nodeIPSpinner.setAdapter(adapterNodeIP);
+        rosNodeIPSpinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+        ArrayAdapter<String> adapterRosNodeIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosIPDataStr));
+        adapterRosNodeIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rosNodeIPSpinner.setAdapter(adapterRosNodeIP);
 
         rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
         ArrayAdapter<String> adapterRosPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosPrefixDataStr));
@@ -177,13 +178,13 @@ public class SettingsActivity extends Activity {
         }
 
         //TODO: change node to ros
-        if(!isNewNodeIP) {
-            nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
-            ros_ip = nodeIPSpinner.getSelectedItem().toString();
+        if(!isNewRosNodeIP) {
+            rosNodeIPSpinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+            ros_ip = rosNodeIPSpinner.getSelectedItem().toString();
         }
         else {
-            enterNewNodeIPEdit = (EditText) findViewById(R.id.NODE_IP_EDIT);
-            ros_ip = enterNewNodeIPEdit.getText().toString();
+            enterNewRosNodeIPEdit = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+            ros_ip = enterNewRosNodeIPEdit.getText().toString();
             writeFile("previousDataRosIP", rosIPDataStr, ros_ip);
         }
 
@@ -241,7 +242,7 @@ public class SettingsActivity extends Activity {
         tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
         namespace = savedInstanceState.getString("NAMESPACE");
         ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
+        tango_addr_edit = (TextView) findViewById(R.id.ROS_NODE_IP_EDIT);
         prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
         ros_master_edit.setText(ros_master);
@@ -249,7 +250,7 @@ public class SettingsActivity extends Activity {
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
     }
-//TODO: Use "STRING_NAME" + "STRING_TYPE" for ids and prints
+    
     public void toggleMasterIP(View view) {
         masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         enterNewMasterIPBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
@@ -268,21 +269,21 @@ public class SettingsActivity extends Activity {
        }
     }
 
-    public void toggleNodeIP(View view) {
-        nodeIPSpinner = (Spinner) findViewById(R.id.NODE_IP_SPINNER);
-        enterNewNodeIPBtn = (Button) findViewById(R.id.TOGGLE_NODE_IP_BTN);
-        enterNewNodeIPEdit = (EditText) findViewById(R.id.NODE_IP_EDIT);
-        if(!isNewNodeIP) {
-            isNewNodeIP = true;
-            nodeIPSpinner.setVisibility(View.GONE);
-            enterNewNodeIPBtn.setText("Back to list");
-            enterNewNodeIPEdit.setVisibility(View.VISIBLE);
+    public void toggleRosNodeIP(View view) {
+        rosNodeIPSpinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+        enterNewRosNodeIPBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
+        enterNewRosNodeIPEdit = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+        if(!isNewRosNodeIP) {
+            isNewRosNodeIP = true;
+            rosNodeIPSpinner.setVisibility(View.GONE);
+            enterNewRosNodeIPBtn.setText("Back to list");
+            enterNewRosNodeIPEdit.setVisibility(View.VISIBLE);
         }
         else{
-            isNewNodeIP = false;
-            nodeIPSpinner.setVisibility(View.VISIBLE);
-            enterNewNodeIPBtn.setText("Set New IP");
-            enterNewNodeIPEdit.setVisibility(View.GONE);
+            isNewRosNodeIP = false;
+            rosNodeIPSpinner.setVisibility(View.VISIBLE);
+            enterNewRosNodeIPBtn.setText("Set New IP");
+            enterNewRosNodeIPEdit.setVisibility(View.GONE);
         }
     }
 

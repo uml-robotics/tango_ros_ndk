@@ -42,12 +42,12 @@
             android:layout_height="wrap_content"
             android:text="@string/ROS_NODE_LBL" />
         <Spinner
-            android:id="@+id/NODE_IP_SPINNER"
+            android:id="@+id/ROS_NODE_IP_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"/>
         <EditText
-            android:id="@+id/NODE_IP_EDIT"
+            android:id="@+id/ROS_NODE_IP_EDIT"
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             android:inputType="textUri"
             android:text="@string/edit_new_node_ip" />
         <Button
-            android:id="@+id/TOGGLE_NODE_IP_BTN"
+            android:id="@+id/TOGGLE_ROS_NODE_IP_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="toggleNodeIP"
