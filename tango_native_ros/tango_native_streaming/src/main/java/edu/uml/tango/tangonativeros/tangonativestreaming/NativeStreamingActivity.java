@@ -65,7 +65,7 @@ import android.widget.TextView;
  */
 public class NativeStreamingActivity extends Activity {
 
-    public static String master_prefix, ros_master, master_port, ros_ip, tango_prefix, namespace,
+    public static String ros_master, ros_ip, tango_prefix, namespace,
                     ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
 
     public boolean isPaused = false, needsRestart = false;
@@ -92,17 +92,13 @@ public class NativeStreamingActivity extends Activity {
             ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
             tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX_JSTR");
             namespace_jstr = savedInstanceState.getString("NAMESPACE_JSTR");
-            master_prefix = savedInstanceState.getString("MASTER_PREFIX");
             ros_master = savedInstanceState.getString("ROS_MASTER");
-            master_port = savedInstanceState.getString("MASTER_PORT");
             ros_ip = savedInstanceState.getString("ROS_IP");
             tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
             namespace = savedInstanceState.getString("NAMESPACE");
         } else {
             Intent intent = getIntent();
-            master_prefix = intent.getStringExtra("MASTER_PREFIX");
             ros_master = intent.getStringExtra("ROS_MASTER");
-            master_port = intent.getStringExtra("MASTER_PORT");
             ros_ip = intent.getStringExtra("ROS_IP");
             tango_prefix = intent.getStringExtra("TANGO_PREFIX");
             namespace = intent.getStringExtra("NAMESPACE");
@@ -115,7 +111,7 @@ public class NativeStreamingActivity extends Activity {
     boolean hasConfigChanged() {
         boolean restart = false;
         if (ros_master_jstr != null || ros_ip_jstr != null || tango_prefix_jstr != null || namespace_jstr != null) {
-            restart = (ros_master_jstr != master_prefix + ros_master + ':' + master_port) || (ros_ip_jstr != ros_ip) || (tango_prefix_jstr != tango_prefix) || (namespace_jstr != namespace);
+            restart = (ros_master_jstr != ros_master) || (ros_ip_jstr != ros_ip) || (tango_prefix_jstr != tango_prefix) || (namespace_jstr != namespace);
         }
         return restart;
     }
@@ -137,7 +133,7 @@ public class NativeStreamingActivity extends Activity {
 
         needsRestart = hasConfigChanged();
 
-        ros_master_jstr = master_prefix + ros_master + ':' + master_port;
+        ros_master_jstr = ros_master;
         ros_ip_jstr = ros_ip;
         tango_prefix_jstr = tango_prefix;
         namespace_jstr = namespace;
@@ -186,9 +182,7 @@ public class NativeStreamingActivity extends Activity {
         savedInstanceState.putString("ROS_IP_JSTR", ros_ip_jstr);
         savedInstanceState.putString("TANGO_PREFIX_JSTR", tango_prefix_jstr);
         savedInstanceState.putString("NAMESPACE_JSTR", namespace_jstr);
-        savedInstanceState.putString("MASTER_PREFIX", master_prefix);
         savedInstanceState.putString("ROS_MASTER", ros_master);
-        savedInstanceState.putString("MASTER_PORT", master_port);
         savedInstanceState.putString("ROS_IP", ros_ip);
         savedInstanceState.putString("TANGO_PREFIX", tango_prefix);
         savedInstanceState.putString("NAMESPACE", namespace);
@@ -203,9 +197,7 @@ public class NativeStreamingActivity extends Activity {
         ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
         tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX_JSTR");
         namespace_jstr = savedInstanceState.getString("NAMESPACE_JSTR");
-        master_prefix = savedInstanceState.getString("MASTER_PREFIX");
         ros_master = savedInstanceState.getString("ROS_MASTER");
-        master_port = savedInstanceState.getString("MASTER_PORT");
         ros_ip = savedInstanceState.getString("ROS_IP");
         tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
         namespace = savedInstanceState.getString("NAMESPACE");

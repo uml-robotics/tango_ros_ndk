@@ -15,13 +15,11 @@ import java.util.List;
 
 public class SettingsActivity extends Activity {
 
-    public static String master_prefix = "http://",
-                         ros_master = "10.0.7.172",
-                         master_port = "11311",
+    public static String ros_master = "http://10.0.7.172:11311",
                          ros_ip = "",
                          tango_prefix = "tango_brain_0/",
                          namespace = "tango_brain_0";
-    public TextView ros_master_prefix_edit, ros_master_edit, ros_port_edit, tango_addr_edit, prefix_edit, tango_namespace_edit,
+    public TextView ros_master_edit, tango_addr_edit, prefix_edit, tango_namespace_edit,
                     err_no_master;
 
     @Override
@@ -29,12 +27,8 @@ public class SettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        if (intent.hasExtra("MASTER_PREFIX"))
-            master_prefix = intent.getStringExtra("MASTER_PREFIX");
         if (intent.hasExtra("ROS_MASTER"))
             ros_master = intent.getStringExtra("ROS_MASTER");
-        if (intent.hasExtra("MASTER_PORT"))
-            master_port = intent.getStringExtra("MASTER_PORT");
         if (intent.hasExtra("ROS_IP"))
             ros_ip = intent.getStringExtra("ROS_IP");
         if (intent.hasExtra("TANGO_PREFIX"))
@@ -45,9 +39,7 @@ public class SettingsActivity extends Activity {
 
         ros_ip = getIPAddress(true);
         setContentView(R.layout.activity_settings);
-        ros_master_prefix_edit = (TextView) findViewById(R.id.MASTER_PREFIX_EDIT);
         ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        ros_port_edit = (TextView) findViewById(R.id.MASTER_PORT_EDIT);
         tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
         prefix_edit = (TextView) findViewById(R.id.PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
@@ -55,16 +47,12 @@ public class SettingsActivity extends Activity {
         err_no_master = (TextView) findViewById(R.id.ERR_NO_MASTER_LBL);
 
         if (savedInstanceState != null) {
-            master_prefix = savedInstanceState.getString("MASTER_PREFIX");
             ros_master = savedInstanceState.getString("ROS_MASTER");
-            master_port = savedInstanceState.getString("MASTER_PORT");
             ros_ip = savedInstanceState.getString("ROS_IP");
             tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
             namespace = savedInstanceState.getString("NAMESPACE");
         }
-        ros_master_prefix_edit.setText(master_prefix);
         ros_master_edit.setText(ros_master);
-        ros_port_edit.setText(master_port);
 
         if (!ros_ip.equals("")) {
             tango_addr_edit.setText(ros_ip);
@@ -110,41 +98,31 @@ public class SettingsActivity extends Activity {
     }
 
     public void startStreaming(View view) {
-        master_prefix = ros_master_prefix_edit.getText().toString();
         ros_master = ros_master_edit.getText().toString();
-        master_port = ros_port_edit.getText().toString();
         ros_ip = tango_addr_edit.getText().toString();
         tango_prefix = prefix_edit.getText().toString();
         namespace = tango_namespace_edit.getText().toString();
-        Log.d("ROS Master prefix", master_prefix);
-        Log.d("ROS Master IP: ", ros_master);
-        Log.d("ROS port: ", master_port);
+        Log.d("ROS Master URI: ", ros_master);
         Log.d("Tango IP: ", ros_ip);
         Log.d("Tango prefix: ", tango_prefix);
         Log.d("Tango Namespace: ", namespace);
         Intent intent = new Intent(this, NativeStreamingActivity.class);
-        intent.putExtra("MASTER_PREFIX", master_prefix);
         intent.putExtra("ROS_MASTER", ros_master);
-        intent.putExtra("MASTER_PORT", master_port);
         intent.putExtra("ROS_IP", ros_ip);
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
         startActivity(intent);
-//        finish();
+        finish();
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        master_prefix = ros_master_prefix_edit.getText().toString();
         ros_master = ros_master_edit.getText().toString();
-        master_port = ros_port_edit.getText().toString();
         ros_ip = tango_addr_edit.getText().toString();
         tango_prefix = prefix_edit.getText().toString();
         namespace = tango_namespace_edit.getText().toString();
-        savedInstanceState.putString("MASTER_PREFIX", master_prefix);
         savedInstanceState.putString("ROS_MASTER", ros_master);
-        savedInstanceState.putString("MASTER_PORT", master_port);
         savedInstanceState.putString("ROS_IP", ros_ip);
         savedInstanceState.putString("TANGO_PREFIX", tango_prefix);
         savedInstanceState.putString("NAMESPACE", namespace);
@@ -153,21 +131,15 @@ public class SettingsActivity extends Activity {
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        master_prefix = savedInstanceState.getString("MASTER_PREFIX");
         ros_master = savedInstanceState.getString("ROS_MASTER");
-        master_port = savedInstanceState.getString("MASTER_PORT");
         ros_ip = savedInstanceState.getString("ROS_IP");
         tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
         namespace = savedInstanceState.getString("NAMESPACE");
-        ros_master_prefix_edit = (TextView) findViewById(R.id.MASTER_PREFIX_EDIT);
         ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        ros_port_edit = (TextView) findViewById(R.id.MASTER_PORT_EDIT);
         tango_addr_edit = (TextView) findViewById(R.id.NODE_IP_EDIT);
         prefix_edit = (TextView) findViewById(R.id.PREFIX_EDIT);
         tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
-        ros_master_prefix_edit.setText(master_prefix);
         ros_master_edit.setText(ros_master);
-        ros_port_edit.setText(master_port);
         tango_addr_edit.setText(ros_ip);
         prefix_edit.setText(tango_prefix);
         tango_namespace_edit.setText(namespace);
