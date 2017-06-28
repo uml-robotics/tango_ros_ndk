@@ -140,7 +140,7 @@ public class SettingsActivity extends Activity {
         namespaceSpinner.setAdapter(adapterNamespace);*/
 
         //TODO: Move this to the class if possible?
-        masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+       /* masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
         rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
         namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
@@ -155,16 +155,22 @@ public class SettingsActivity extends Activity {
         rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
         namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
 
-        masterIPComponent.initData("previousDataMasterIP");
-        rosIPComponent.initData("previousDataRosIP");
-        rosPrefixComponent.initData("previousDataRosPrefix");
-        namespaceCompentent.initData("previousDataNamespace");
 
 
         masterIPComponent.initSpinner(this);
         rosIPComponent.initSpinner(this);
         rosPrefixComponent.initSpinner(this);
-        namespaceCompentent.initSpinner(this);
+        namespaceCompentent.initSpinner(this);*/
+
+        masterIPComponent.fileName = "previousDataMasterIP";
+        rosIPComponent.fileName = "previousDataRosIP";
+        rosPrefixComponent.fileName = "previousDataRosPrefix";
+        namespaceCompentent.fileName = "previousDataNamespace";
+
+        masterIPComponent.initData();
+        rosIPComponent.initData();
+        rosPrefixComponent.initData();
+        namespaceCompentent.initData();
     }
 
     @Override

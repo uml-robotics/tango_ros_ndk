@@ -29,7 +29,7 @@ public class ToggleUI extends SettingsActivity  {
         spinner.setAdapter(adapter);
     }
 
-    public void initData(String fileName){
+    public void initData(   ){
         readFile(fileName);
     }
 
