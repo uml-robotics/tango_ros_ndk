@@ -24,7 +24,6 @@ public class ToggleUI extends SettingsActivity  {
     String fileName;
 
     public void initSpinner(Context context){
-        //spinner = (Spinner) findViewById(id);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseStr(dataStr));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -37,21 +36,16 @@ public class ToggleUI extends SettingsActivity  {
     public String dataFromUser(){
         String newData;
         if(!isNew) {
-            //spinner = (Spinner) findViewById(idSpinner);
             return spinner.getSelectedItem().toString();
         }
         else {
-            //editTxt = (EditText) findViewById(idEditTxt);
             newData = editTxt.getText().toString();
-            //writeFile(fileName, dataStr, newData);
+            writeFile(fileName, dataStr, newData);
             return newData;
         }
     }
-
+//TODO: Variable for set text "New" not all are ips
     public void toggleBtns(){
-        //spinner = (Spinner) findViewById(idSpinner);
-        //toggleBtn = (Button) findViewById(idBtn);
-        //editTxt = (EditText) findViewById(idEdt);
         if(!isNew) {
             isNew = true;
             spinner.setVisibility(View.GONE);
@@ -67,7 +61,7 @@ public class ToggleUI extends SettingsActivity  {
 
     }
 
-  /*  public List<String> reverseStr(List<String> str){
+    public List<String> reverseStr(List<String> str){
         List<String> revStr = new ArrayList<String>();
         int index;
         //Reverse str so that the most recent IP is on top of spinner
@@ -75,7 +69,7 @@ public class ToggleUI extends SettingsActivity  {
             revStr.add(str.get(index));
         }
         return revStr;
-    }*/
+    }
 /*
     public void readFile(String fileName){
         dataStr = new ArrayList<String>();
