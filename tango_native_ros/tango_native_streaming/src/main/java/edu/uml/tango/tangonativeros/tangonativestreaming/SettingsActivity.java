@@ -20,14 +20,15 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
 
-//TODO: move file code to class
+//TODO: move file code to class?
 
 public class SettingsActivity extends Activity {
     public static String ros_master = "http://10.0.7.104:11311",
                          ros_ip = "",
                          tango_prefix = "tango_brain_0/",
                          namespace = "tango_brain_0";
-    public TextView ros_master_edit, tango_addr_edit, prefix_edit, tango_namespace_edit, err_no_master;
+    //ros_master_edit, tango_addr_edit, prefix_edit, tango_namespace_edit
+    public TextView err_no_master;
 
     ToggleUI masterIPComponent;
     ToggleUI rosIPComponent;
@@ -55,24 +56,6 @@ public class SettingsActivity extends Activity {
 
         ros_ip = getIPAddress(true);
         setContentView(R.layout.activity_settings);
-        ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        tango_addr_edit = (TextView) findViewById(R.id.ROS_NODE_IP_EDIT);
-        prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
-        tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
-        err_no_master = (TextView) findViewById(R.id.ERR_NO_MASTER_LBL);
-
-        if (savedInstanceState != null) {
-            ros_master = savedInstanceState.getString("ROS_MASTER");
-            ros_ip = savedInstanceState.getString("ROS_IP");
-            tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
-            namespace = savedInstanceState.getString("NAMESPACE");
-        }
-
-        if (!ros_ip.equals("")) {
-            tango_addr_edit.setText(ros_ip);
-        } else {
-            tango_addr_edit.setText("tango_addr_error");
-        }
 
         masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
@@ -88,6 +71,25 @@ public class SettingsActivity extends Activity {
         rosPrefixComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
         rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
         namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
+
+        //ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
+        //tango_addr_edit = (TextView) findViewById(R.id.ROS_NODE_IP_EDIT);
+        //prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
+        //tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
+        err_no_master = (TextView) findViewById(R.id.ERR_NO_MASTER_LBL);
+
+        if (savedInstanceState != null) {
+            ros_master = savedInstanceState.getString("ROS_MASTER");
+            ros_ip = savedInstanceState.getString("ROS_IP");
+            tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
+            namespace = savedInstanceState.getString("NAMESPACE");
+        }
+
+        if (!ros_ip.equals("")) {
+            rosIPComponent.editTxt.setText(ros_ip);
+        } else {
+            rosIPComponent.editTxt.setText(R.string.tangoAddrError);
+        }
 
         masterIPComponent.fileName = "previousDataMasterIP";
         rosIPComponent.fileName = "previousDataRosIP";
@@ -110,10 +112,10 @@ public class SettingsActivity extends Activity {
         readFile(namespaceCompentent.fileName, namespaceCompentent.dataStr);
 
         if(rosPrefixComponent.dataStr.size() == 0) {
-            prefix_edit.setText("tango_brain_0/");
+            rosPrefixComponent.editTxt.setText(R.string.defaultPrefix);
         }
         if(namespaceCompentent.dataStr.size() == 0) {
-            tango_namespace_edit.setText("tango_brain_0");
+            namespaceCompentent.editTxt.setText(R.string.defaultNamespace);
         }
 
         masterIPComponent.initSpinner(this);
@@ -150,7 +152,9 @@ public class SettingsActivity extends Activity {
                     }
                 }
             }
-        } catch (Exception ex) { } // for now eat exceptions
+        } catch (Exception ex) {
+            Log.e("Get Tango IP Error","");
+        } // for now eat exceptions
         return "";
     }
     public void startStreaming(View view) {
@@ -169,9 +173,7 @@ public class SettingsActivity extends Activity {
             writeFile(rosIPComponent.fileName, rosIPComponent.dataStr, ros_ip);
         }
         else{
-            updateOrder(rosIPComponent.fileName,rosIPComponent.dataStr, ros_ip
-
-            );
+            updateOrder(rosIPComponent.fileName,rosIPComponent.dataStr, ros_ip);
         }
         tango_prefix = rosPrefixComponent.dataFromUser();
         if(rosPrefixComponent.isNew) {
@@ -204,10 +206,10 @@ public class SettingsActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        ros_master = ros_master_edit.getText().toString();
-        ros_ip = tango_addr_edit.getText().toString();
-        tango_prefix = prefix_edit.getText().toString();
-        namespace = tango_namespace_edit.getText().toString();
+        ros_master = masterIPComponent.editTxt.getText().toString();
+        ros_ip = rosIPComponent.editTxt.getText().toString();
+        tango_prefix = rosPrefixComponent.editTxt.getText().toString();
+        namespace = namespaceCompentent.editTxt.getText().toString();
         savedInstanceState.putString("ROS_MASTER", ros_master);
         savedInstanceState.putString("ROS_IP", ros_ip);
         savedInstanceState.putString("TANGO_PREFIX", tango_prefix);
@@ -221,14 +223,14 @@ public class SettingsActivity extends Activity {
         ros_ip = savedInstanceState.getString("ROS_IP");
         tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
         namespace = savedInstanceState.getString("NAMESPACE");
-        ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        tango_addr_edit = (TextView) findViewById(R.id.ROS_NODE_IP_EDIT);
-        prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
-        tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
-        ros_master_edit.setText(ros_master);
-        tango_addr_edit.setText(ros_ip);
-        prefix_edit.setText(tango_prefix);
-        tango_namespace_edit.setText(namespace);
+        masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+        rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+        namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+        masterIPComponent.editTxt.setText(ros_master);
+        rosIPComponent.editTxt.setText(ros_ip);
+        rosPrefixComponent.editTxt.setText(tango_prefix);
+        namespaceCompentent.editTxt.setText(namespace);
     }
 
     public void toggleMasterIP(View view) {
@@ -261,6 +263,7 @@ public class SettingsActivity extends Activity {
             fis.close();
         }
         catch (Throwable t) {
+            Log.e("Read File Error","");
         }
     }
 
@@ -283,7 +286,7 @@ public class SettingsActivity extends Activity {
                 fos.close();
             }
             catch (Throwable t) {
-
+                Log.e("Write File Error","");
             }
         }
 
@@ -306,6 +309,7 @@ public class SettingsActivity extends Activity {
                 fos.close();
             }
             catch (Throwable t) {
+                Log.e("Update Order File Error","");
             }
     }
 }

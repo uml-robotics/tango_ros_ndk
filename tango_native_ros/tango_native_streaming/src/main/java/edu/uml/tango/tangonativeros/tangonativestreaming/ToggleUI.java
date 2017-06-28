@@ -9,23 +9,23 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.List;
+//extends SettingsActivity
+class ToggleUI {
+    boolean isNew = false;
+    Spinner spinner;
+    EditText editTxt;
+    Button toggleBtn;
+    List<String> dataStr = new ArrayList<String>();
+    String fileName;
+    String newDataButtonString;
 
-public class ToggleUI extends SettingsActivity  {
-    public boolean isNew = false;
-    public Spinner spinner;
-    public EditText editTxt;
-    public Button toggleBtn;
-    public List<String> dataStr = new ArrayList<String>();
-    public String fileName;
-    public String newDataButtonString;
-
-    public void initSpinner(Context context){
+    void initSpinner(Context context){
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseList(dataStr));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
 
-    public String dataFromUser(){
+    String dataFromUser(){
         String newData;
         if(!isNew) {
             newData = spinner.getSelectedItem().toString();
@@ -36,11 +36,11 @@ public class ToggleUI extends SettingsActivity  {
         return newData;
     }
 
-    public void toggleBtns(){
+    void toggleBtns(){
         if(!isNew) {
             isNew = true;
             spinner.setVisibility(View.GONE);
-            toggleBtn.setText("Back to list");
+            toggleBtn.setText(R.string.backToList);
             editTxt.setVisibility(View.VISIBLE);
         }
         else{
