@@ -27,7 +27,6 @@ public class SettingsActivity extends Activity {
                          ros_ip = "",
                          tango_prefix = "tango_brain_0/",
                          namespace = "tango_brain_0";
-    //ros_master_edit, tango_addr_edit, prefix_edit, tango_namespace_edit
     public TextView err_no_master;
 
     ToggleUI masterIPComponent;
@@ -72,10 +71,6 @@ public class SettingsActivity extends Activity {
         rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
         namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
 
-        //ros_master_edit = (TextView) findViewById(R.id.MASTER_IP_EDIT);
-        //tango_addr_edit = (TextView) findViewById(R.id.ROS_NODE_IP_EDIT);
-        //prefix_edit = (TextView) findViewById(R.id.ROS_PREFIX_EDIT);
-        //tango_namespace_edit = (TextView) findViewById(R.id.NAMESPACE_EDIT);
         err_no_master = (TextView) findViewById(R.id.ERR_NO_MASTER_LBL);
 
         if (savedInstanceState != null) {
@@ -292,6 +287,7 @@ public class SettingsActivity extends Activity {
 
     public void updateOrder(String fileName, List<String> str, String newString) {
         int index;
+
         for(index = 0; index < str.size(); index++) {
             if (str.get(index).equals(newString)) {
                 str.remove(index);
@@ -299,6 +295,7 @@ public class SettingsActivity extends Activity {
             }
         }
             str.add(newString);
+
             try {
                 FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
 
