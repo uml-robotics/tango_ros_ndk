@@ -286,15 +286,15 @@ public class SettingsActivity extends Activity {
 
             }
         }
-//TODO: Fix updateOrder: Does not remove the old one from the spinner
+
     public void updateOrder(String fileName, List<String> str, String newString) {
         int index;
-        for(index = 0; index < str.size(); index++)
-        {
-            if(str.get(index).equals(newString)){
+        for(index = 0; index < str.size(); index++) {
+            if (str.get(index).equals(newString)) {
                 str.remove(index);
                 break;
             }
+        }
             str.add(newString);
             try {
                 FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -307,6 +307,5 @@ public class SettingsActivity extends Activity {
             }
             catch (Throwable t) {
             }
-        }
     }
 }
