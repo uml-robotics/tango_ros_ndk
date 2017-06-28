@@ -17,6 +17,7 @@ public class ToggleUI extends SettingsActivity  {
     public Button toggleBtn;
     public List<String> dataStr;
     public String fileName;
+    public String newDataString;
 
     public void initSpinner(Context context){
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseList(dataStr));
@@ -34,7 +35,7 @@ public class ToggleUI extends SettingsActivity  {
             return newData;
         }
     }
-//TODO: Variable for set text "New" not all are ips
+//TODO: Variable for set text "New" not all are ips  - test
     public void toggleBtns(){
         if(!isNew) {
             isNew = true;
@@ -45,7 +46,7 @@ public class ToggleUI extends SettingsActivity  {
         else{
             isNew = false;
             spinner.setVisibility(View.VISIBLE);
-            toggleBtn.setText("Set New IP");
+            toggleBtn.setText(newDataString);
             editTxt.setVisibility(View.GONE);
         }
 
