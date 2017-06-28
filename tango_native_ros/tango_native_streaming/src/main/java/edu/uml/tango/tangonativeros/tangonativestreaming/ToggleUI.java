@@ -42,7 +42,7 @@ public class ToggleUI extends SettingsActivity  {
         else {
             //editTxt = (EditText) findViewById(idEditTxt);
             newData = editTxt.getText().toString();
-            writeFile(fileName, dataStr, newData);
+            writeFile(fileName, newData);
             return newData;
         }
     }
@@ -95,20 +95,20 @@ public class ToggleUI extends SettingsActivity  {
         }
     }
 
-    public void writeFile(String fileName, List<String> str, String newString){
+    public void writeFile(String fileName, String newString){
         int index;
 
         //Removes the oldest ip to make space for the new one
-        while (str.size() >= 5) {
-            str.remove(0);
+        while (dataStr.size() >= 5) {
+            dataStr.remove(0);
         }
-        str.add(newString);
+        dataStr.add(newString);
 
         try {
             FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
 
-            for(index = 0; index < str.size(); index ++) {
-                fos.write(str.get(index).getBytes());
+            for(index = 0; index < dataStr.size(); index ++) {
+                fos.write(dataStr.get(index).getBytes());
                 fos.write(System.getProperty("line.separator").getBytes());
             }
             fos.close();

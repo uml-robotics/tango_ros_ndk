@@ -199,7 +199,9 @@ public class SettingsActivity extends Activity {
         return "";
     }
     public void startStreaming(View view) {
-/*
+
+        Intent intent = new Intent(this, NativeStreamingActivity.class);
+
         masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
         rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
@@ -209,8 +211,12 @@ public class SettingsActivity extends Activity {
         rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
         rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
         namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
-*/
-        Intent intent = new Intent(this, NativeStreamingActivity.class);
+
+        masterIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
+        rosPrefixComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
+        rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
+        namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
+
         ros_master = masterIPComponent.dataFromUser();
         ros_ip = rosIPComponent.dataFromUser();
         tango_prefix = rosPrefixComponent.dataFromUser();
@@ -300,17 +306,30 @@ public class SettingsActivity extends Activity {
     }
 
     public void toggleMasterIP(View view) {
+        masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+        masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+        masterIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
         masterIPComponent.toggleBtns();
     }
 
     public void toggleRosNodeIP(View view) {
+        rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+        rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+        rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
         rosIPComponent.toggleBtns();
     }
 
     public void toggleRosPrefix(View view) {
+        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+        rosPrefixComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
         rosPrefixComponent.toggleBtns();
     }
+
     public void toggleNewNamespace(View view) {
+        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+        namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+        namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
         namespaceCompentent.toggleBtns();
     }
 
