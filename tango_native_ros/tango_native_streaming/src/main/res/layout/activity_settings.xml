@@ -22,8 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="8"
-            android:inputType="textUri"
-            android:text="@string/edit_new_master_ip" />
+            android:inputType="textUri" />
         <Button
             android:id="@+id/TOGGLE_MASTER_IP_BTN"
             android:layout_width="wrap_content"
@@ -52,8 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="8"
-            android:inputType="textUri"
-            android:text="@string/edit_new_node_ip" />
+            android:inputType="textUri" />
         <Button
             android:id="@+id/TOGGLE_ROS_NODE_IP_BTN"
             android:layout_width="wrap_content"
@@ -82,8 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="8"
-            android:inputType="textUri"
-            android:text="@string/edit_new_ros_prefix" />
+            android:inputType="textUri" />
         <Button
             android:id="@+id/TOGGLE_ROS_PREFIX_BTN"
             android:layout_width="wrap_content"
@@ -112,8 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="8"
-            android:inputType="textUri"
-            android:text="@string/edit_new_namespace" />
+            android:inputType="textUri" />
         <Button
             android:id="@+id/TOGGLE_NAMESPACE_BTN"
             android:layout_width="wrap_content"

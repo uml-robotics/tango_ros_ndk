@@ -15,9 +15,9 @@ public class ToggleUI extends SettingsActivity  {
     public Spinner spinner;
     public EditText editTxt;
     public Button toggleBtn;
-    public List<String> dataStr;
+    public List<String> dataStr = new ArrayList<String>();
     public String fileName;
-    public String newDataString;
+    public String newDataButtonString;
 
     public void initSpinner(Context context){
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseList(dataStr));
@@ -28,14 +28,14 @@ public class ToggleUI extends SettingsActivity  {
     public String dataFromUser(){
         String newData;
         if(!isNew) {
-            return spinner.getSelectedItem().toString();
+            newData = spinner.getSelectedItem().toString();
         }
         else {
             newData = editTxt.getText().toString();
-            return newData;
         }
+        return newData;
     }
-//TODO: Variable for set text "New" not all are ips  - test
+
     public void toggleBtns(){
         if(!isNew) {
             isNew = true;
@@ -46,7 +46,7 @@ public class ToggleUI extends SettingsActivity  {
         else{
             isNew = false;
             spinner.setVisibility(View.VISIBLE);
-            toggleBtn.setText(newDataString);
+            toggleBtn.setText(newDataButtonString);
             editTxt.setVisibility(View.GONE);
         }
 
