@@ -1,6 +1,7 @@
 package edu.uml.tango.tangonativeros.tangonativestreaming;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,7 +31,7 @@ public class ToggleUI extends SettingsActivity  {
     }
 
     public void initData(   ){
-        readFile(fileName);
+        readFile(fileName, dataStr);
     }
 
     public String dataFromUser(){
@@ -42,7 +43,7 @@ public class ToggleUI extends SettingsActivity  {
         else {
             //editTxt = (EditText) findViewById(idEditTxt);
             newData = editTxt.getText().toString();
-            writeFile(fileName, newData);
+            //writeFile(fileName, dataStr, newData);
             return newData;
         }
     }
@@ -66,7 +67,7 @@ public class ToggleUI extends SettingsActivity  {
 
     }
 
-    public List<String> reverseStr(List<String> str){
+  /*  public List<String> reverseStr(List<String> str){
         List<String> revStr = new ArrayList<String>();
         int index;
         //Reverse str so that the most recent IP is on top of spinner
@@ -74,13 +75,14 @@ public class ToggleUI extends SettingsActivity  {
             revStr.add(str.get(index));
         }
         return revStr;
-    }
-
+    }*/
+/*
     public void readFile(String fileName){
         dataStr = new ArrayList<String>();
         String line;
 
         try {
+            Log.i("InRead", "");
             FileInputStream fis = openFileInput(fileName);
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
             line = in.readLine();
@@ -92,6 +94,7 @@ public class ToggleUI extends SettingsActivity  {
             fis.close();
         }
         catch (Throwable t) {
+            Log.i("ReadFileFailed","");
         }
     }
 
@@ -105,6 +108,7 @@ public class ToggleUI extends SettingsActivity  {
         dataStr.add(newString);
 
         try {
+            Log.i("InWrite", "");
             FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
 
             for(index = 0; index < dataStr.size(); index ++) {
@@ -114,7 +118,8 @@ public class ToggleUI extends SettingsActivity  {
             fos.close();
         }
         catch (Throwable t) {
+            Log.i("WriteFileFailed","");
 
         }
-    }
+    }*/
 }

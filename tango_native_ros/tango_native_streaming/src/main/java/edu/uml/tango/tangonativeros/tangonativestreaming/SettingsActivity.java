@@ -140,11 +140,6 @@ public class SettingsActivity extends Activity {
         namespaceSpinner.setAdapter(adapterNamespace);*/
 
         //TODO: Move this to the class if possible?
-       /* masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-        rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
-        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-
         masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
         rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
         rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
@@ -155,22 +150,49 @@ public class SettingsActivity extends Activity {
         rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
         namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
 
-
-
-        masterIPComponent.initSpinner(this);
-        rosIPComponent.initSpinner(this);
-        rosPrefixComponent.initSpinner(this);
-        namespaceCompentent.initSpinner(this);*/
-
         masterIPComponent.fileName = "previousDataMasterIP";
         rosIPComponent.fileName = "previousDataRosIP";
         rosPrefixComponent.fileName = "previousDataRosPrefix";
         namespaceCompentent.fileName = "previousDataNamespace";
 
-        masterIPComponent.initData();
-        rosIPComponent.initData();
-        rosPrefixComponent.initData();
-        namespaceCompentent.initData();
+        masterIPComponent.dataStr = new ArrayList<String>();
+        rosIPComponent.dataStr = new ArrayList<String>();
+        rosPrefixComponent.dataStr = new ArrayList<String>();
+        namespaceCompentent.dataStr = new ArrayList<String>();
+        readFile(masterIPComponent.fileName, masterIPComponent.dataStr);
+        readFile(rosIPComponent.fileName, rosIPComponent.dataStr);
+        readFile(rosPrefixComponent.fileName, rosPrefixComponent.dataStr);
+        readFile(namespaceCompentent.fileName, namespaceCompentent.dataStr);
+        //masterIPComponent.initData();
+        //rosIPComponent.initData();
+        //rosPrefixComponent.initData();
+        //namespaceCompentent.initData();
+        masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+        ArrayAdapter<String> adapterMasterIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(masterIPComponent.dataStr));
+        adapterMasterIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        masterIPComponent.spinner.setAdapter(adapterMasterIP);
+
+        rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+        ArrayAdapter<String> adapterRosIP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosIPComponent.dataStr));
+        adapterRosIP.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rosIPComponent.spinner.setAdapter(adapterRosIP);
+
+        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        ArrayAdapter<String> adapterRosPrefix = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(rosPrefixComponent.dataStr));
+        adapterRosPrefix.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rosPrefixComponent.spinner.setAdapter(adapterRosPrefix);
+
+        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+        ArrayAdapter<String> adapterNamespace = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, reverseStr(namespaceCompentent.dataStr));
+        adapterNamespace.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        namespaceCompentent.spinner.setAdapter(adapterNamespace);
+
+        //masterIPComponent.initSpinner(this);
+        //rosIPComponent.initSpinner(this);
+        //rosPrefixComponent.initSpinner(this);
+        //namespaceCompentent.initSpinner(this);
+
+
     }
 
     @Override
@@ -208,65 +230,58 @@ public class SettingsActivity extends Activity {
 
         Intent intent = new Intent(this, NativeStreamingActivity.class);
 
-        masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-        rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
-        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-
-        masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
-        rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
-        namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
-
-        masterIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_MASTER_IP_BTN);
-        rosPrefixComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_PREFIX_BTN);
-        rosIPComponent.toggleBtn = (Button) findViewById(R.id.TOGGLE_ROS_NODE_IP_BTN);
-        namespaceCompentent.toggleBtn = (Button) findViewById(R.id.TOGGLE_NAMESPACE_BTN);
-
-        ros_master = masterIPComponent.dataFromUser();
+        /*ros_master = masterIPComponent.dataFromUser();
         ros_ip = rosIPComponent.dataFromUser();
         tango_prefix = rosPrefixComponent.dataFromUser();
-        namespace = namespaceCompentent.dataFromUser();
-        /*
-        if(!isNewMasterIP) {
-            masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-            ros_master = masterIPSpinner.getSelectedItem().toString();
+        namespace = namespaceCompentent.dataFromUser();*/
+
+        if(!masterIPComponent.isNew) {
+            //masterIPSpinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+            masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
+            ros_master = masterIPComponent.spinner.getSelectedItem().toString();
         }
         else {
-            enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-            ros_master = enterNewMasterIPEdit.getText().toString();
-            writeFile("previousDataMasterIP", masterIPDataStr, ros_master);
+            //enterNewMasterIPEdit = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+            masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
+            ros_master = masterIPComponent.editTxt.getText().toString();
+            writeFile("previousDataMasterIP", masterIPComponent.dataStr, ros_master);
         }
 
-        if(!isNewRosNodeIP) {
-            rosNodeIPSpinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
-            ros_ip = rosNodeIPSpinner.getSelectedItem().toString();
+        if(!rosIPComponent.isNew) {
+            //rosIIPSpinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+            rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+            ros_ip = rosIPComponent.spinner.getSelectedItem().toString();
         }
         else {
-            enterNewRosNodeIPEdit = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
-            ros_ip = enterNewRosNodeIPEdit.getText().toString();
-            writeFile("previousDataRosIP", rosIPDataStr, ros_ip);
+            //enterNewRosNodeIPEdit = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+            rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+            ros_ip = rosIPComponent.editTxt.getText().toString();
+            writeFile("previousDataRosIP", rosIPComponent.dataStr, ros_ip);
         }
 
-        if(!isNewRosPrefix) {
-            rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-            tango_prefix = rosPrefixSpinner.getSelectedItem().toString();
+        if(!rosPrefixComponent.isNew) {
+            //rosPrefixSpinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+            rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+            tango_prefix = rosPrefixComponent.spinner.getSelectedItem().toString();
         }
         else {
-            enterNewRosPrefixEdit = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
-            tango_prefix = enterNewRosPrefixEdit.getText().toString();
-           writeFile("previousDataRosPrefix", rosPrefixDataStr, tango_prefix);
+            //enterNewRosPrefixEdit = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+            rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+            tango_prefix = rosPrefixComponent.editTxt.getText().toString();
+           writeFile("previousDataRosPrefix", rosPrefixComponent.dataStr, tango_prefix);
         }
 
-        if(!isNewNamespace) {
-            namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-            namespace = namespaceSpinner.getSelectedItem().toString();
+        if(!namespaceCompentent.isNew) {
+            //namespaceSpinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+            namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+            namespace = namespaceCompentent.spinner.getSelectedItem().toString();
         }
         else {
-            enterNewNamespaceEdit = (EditText) findViewById(R.id.NAMESPACE_EDIT);
-            namespace = enterNewNamespaceEdit.getText().toString();
-            writeFile("previousDataNamespace", namespaceDataStr, namespace);
-        }*/
+            //enterNewNamespaceEdit = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+            namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+            namespace = namespaceCompentent.editTxt.getText().toString();
+            writeFile("previousDataNamespace", namespaceCompentent.dataStr, namespace);
+        }
 
         Log.d("ROS Master URI: ", ros_master);
         Log.d("Tango IP: ", ros_ip);
@@ -411,9 +426,8 @@ public class SettingsActivity extends Activity {
         }
     }
     */
-/*
-    public List<String> readFile(String fileName){
-        List<String> str = new ArrayList<String>();
+
+    public List<String> readFile(String fileName, List<String> str){
         String line;
 
         try {
@@ -431,12 +445,11 @@ public class SettingsActivity extends Activity {
         }
         return str;
     }
-
-    public List<String> reverseStr(List<String> str){
+    public List<String> reverseStr(List<String> str) {
         List<String> revStr = new ArrayList<String>();
         int index;
         //Reverse str so that the most recent IP is on top of spinner
-        for(index = str.size() - 1; index >= 0; index--){
+        for (index = str.size() - 1; index >= 0; index--) {
             revStr.add(str.get(index));
         }
         return revStr;
@@ -464,5 +477,5 @@ public class SettingsActivity extends Activity {
 
             }
         }
-        */
+
 }
