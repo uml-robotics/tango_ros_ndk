@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -25,9 +24,10 @@ import java.util.List;
 //TODO: if size is 0 then use the defaults for tango_prefix ros_ip and namespace
     //tango_brain_0/
     //tango_brain_0
-//TODO: Make all spinner/file code cleaner
-    //make a spinner class
 //TODO: move file code to class
+//TODO: most recent spinner selection to end of list so it is "default"
+//TODO: reset the strings on create
+
 public class SettingsActivity extends Activity {
     public static String ros_master = "",
                          ros_ip = "",
@@ -114,11 +114,6 @@ public class SettingsActivity extends Activity {
         readFile(rosPrefixComponent.fileName, rosPrefixComponent.dataStr);
         readFile(namespaceCompentent.fileName, namespaceCompentent.dataStr);
 
-        //masterIPComponent.initData();
-        //rosIPComponent.initData();
-        //rosPrefixComponent.initData();
-        //namespaceCompentent.initData();
-
         masterIPComponent.initSpinner(this);
         rosIPComponent.initSpinner(this);
         rosPrefixComponent.initSpinner(this);
@@ -162,59 +157,28 @@ public class SettingsActivity extends Activity {
 
         Intent intent = new Intent(this, NativeStreamingActivity.class);
 
-        /*masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-        rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
-        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-
+        masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
         masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
-        rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
-        namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
-
-
         ros_master = masterIPComponent.dataFromUser();
-        ros_ip = rosIPComponent.dataFromUser();
-        tango_prefix = rosPrefixComponent.dataFromUser();
-        namespace = namespaceCompentent.dataFromUser();*/
-
-        if(!masterIPComponent.isNew) {
-            masterIPComponent.spinner = (Spinner) findViewById(R.id.MASTER_IP_SPINNER);
-            ros_master = masterIPComponent.spinner.getSelectedItem().toString();
-        }
-        else {
-            masterIPComponent.editTxt = (EditText) findViewById(R.id.MASTER_IP_EDIT);
-            ros_master = masterIPComponent.editTxt.getText().toString();
+        if(masterIPComponent.isNew) {
             writeFile(masterIPComponent.fileName, masterIPComponent.dataStr, ros_master);
         }
-
-        if(!rosIPComponent.isNew) {
-            rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
-            ros_ip = rosIPComponent.spinner.getSelectedItem().toString();
-        }
-        else {
-            rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
-            ros_ip = rosIPComponent.editTxt.getText().toString();
+        rosIPComponent.spinner = (Spinner) findViewById(R.id.ROS_NODE_IP_SPINNER);
+        rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
+        ros_ip = rosIPComponent.dataFromUser();
+        if(rosIPComponent.isNew) {
             writeFile(rosIPComponent.fileName, rosIPComponent.dataStr, ros_ip);
         }
-
-        if(!rosPrefixComponent.isNew) {
-            rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
-            tango_prefix = rosPrefixComponent.spinner.getSelectedItem().toString();
+        rosPrefixComponent.spinner = (Spinner) findViewById(R.id.ROS_PREFIX_SPINNER);
+        rosPrefixComponent.editTxt = (EditText) findViewById(R.id.ROS_PREFIX_EDIT);
+        tango_prefix = rosPrefixComponent.dataFromUser();
+        if(rosPrefixComponent.isNew) {
+            writeFile(rosPrefixComponent.fileName, rosPrefixComponent.dataStr, tango_prefix);
         }
-        else {
-            rosIPComponent.editTxt = (EditText) findViewById(R.id.ROS_NODE_IP_EDIT);
-            tango_prefix = rosPrefixComponent.editTxt.getText().toString();
-           writeFile(rosPrefixComponent.fileName, rosPrefixComponent.dataStr, tango_prefix);
-        }
-
-        if(!namespaceCompentent.isNew) {
-            namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
-            namespace = namespaceCompentent.spinner.getSelectedItem().toString();
-        }
-        else {
-            namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
-            namespace = namespaceCompentent.editTxt.getText().toString();
+        namespaceCompentent.spinner = (Spinner) findViewById(R.id.NAMESPACE_SPINNER);
+        namespaceCompentent.editTxt = (EditText) findViewById(R.id.NAMESPACE_EDIT);
+        namespace = namespaceCompentent.dataFromUser();
+        if(namespaceCompentent.isNew) {
             writeFile(namespaceCompentent.fileName, namespaceCompentent.dataStr, namespace);
         }
 
@@ -289,7 +253,7 @@ public class SettingsActivity extends Activity {
         namespaceCompentent.toggleBtns();
     }
 
-    public List<String> readFile(String fileName, List<String> str){
+    public void readFile(String fileName, List<String> str){
         String line;
 
         try {
@@ -305,7 +269,6 @@ public class SettingsActivity extends Activity {
         }
         catch (Throwable t) {
         }
-        return str;
     }
 
     public void writeFile(String fileName, List<String> str, String newString){

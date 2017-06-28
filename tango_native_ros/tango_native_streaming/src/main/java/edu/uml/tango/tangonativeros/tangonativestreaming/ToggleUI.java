@@ -1,17 +1,12 @@
 package edu.uml.tango.tangonativeros.tangonativestreaming;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,17 +15,13 @@ public class ToggleUI extends SettingsActivity  {
     public Spinner spinner;
     public EditText editTxt;
     public Button toggleBtn;
-    List<String> dataStr;
-    String fileName;
+    public List<String> dataStr;
+    public String fileName;
 
     public void initSpinner(Context context){
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseStr(dataStr));
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, reverseList(dataStr));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-    }
-
-    public void initData(   ){
-        readFile(fileName, dataStr);
     }
 
     public String dataFromUser(){
@@ -40,7 +31,6 @@ public class ToggleUI extends SettingsActivity  {
         }
         else {
             newData = editTxt.getText().toString();
-            writeFile(fileName, dataStr, newData);
             return newData;
         }
     }
@@ -61,59 +51,13 @@ public class ToggleUI extends SettingsActivity  {
 
     }
 
-    public List<String> reverseStr(List<String> str){
-        List<String> revStr = new ArrayList<String>();
+    private List<String> reverseList(List<String> str){
+        List<String> revList = new ArrayList<String>();
         int index;
-        //Reverse str so that the most recent IP is on top of spinner
+        //Reverse list so that the most recent data from editTxt is on top of spinner
         for(index = str.size() - 1; index >= 0; index--){
-            revStr.add(str.get(index));
+            revList.add(str.get(index));
         }
-        return revStr;
+        return revList;
     }
-/*
-    public void readFile(String fileName){
-        dataStr = new ArrayList<String>();
-        String line;
-
-        try {
-            Log.i("InRead", "");
-            FileInputStream fis = openFileInput(fileName);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            line = in.readLine();
-            while (line != null) {
-                dataStr.add(line);
-                line = in.readLine();
-            }
-            in.close();
-            fis.close();
-        }
-        catch (Throwable t) {
-            Log.i("ReadFileFailed","");
-        }
-    }
-
-    public void writeFile(String fileName, String newString){
-        int index;
-
-        //Removes the oldest ip to make space for the new one
-        while (dataStr.size() >= 5) {
-            dataStr.remove(0);
-        }
-        dataStr.add(newString);
-
-        try {
-            Log.i("InWrite", "");
-            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-
-            for(index = 0; index < dataStr.size(); index ++) {
-                fos.write(dataStr.get(index).getBytes());
-                fos.write(System.getProperty("line.separator").getBytes());
-            }
-            fos.close();
-        }
-        catch (Throwable t) {
-            Log.i("WriteFileFailed","");
-
-        }
-    }*/
 }
