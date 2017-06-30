@@ -440,7 +440,7 @@ void TangoNativeStreamingApp::OnPause() {
   if (ros::ok()) {
     LOGI("Shutting down ros");
     //(ctxt.nh)->shutdown();
-    (ctxt.nh) = nullptr;
+    delete ctxt.nh;
     ros::shutdown();
     LOGI("ros stopped");
   }

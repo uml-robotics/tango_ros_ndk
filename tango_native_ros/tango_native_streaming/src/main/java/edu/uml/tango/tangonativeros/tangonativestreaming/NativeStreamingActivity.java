@@ -88,7 +88,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i("NativeStreamingActivity.onCreate ","Creating NativeStreamingActivity");
+        Log.i("NativeStreamingActivity","Creating NativeStreamingActivity");
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
