@@ -114,14 +114,18 @@ public class NativeStreamingActivity extends Activity {
     boolean hasConfigChanged() {
         boolean restart = false;
 
-        restart |= ros_master_jstr == null;
+        /*restart |= ros_master_jstr == null;
         restart |= ros_ip_jstr == null;
         restart |= tango_prefix_jstr == null;
         restart |= namespace_jstr == null;
         if (ros_master_jstr != null && ros_master != null) restart |= !ros_master_jstr.equals(ros_master);
         if (ros_ip_jstr != null && ros_ip != null) restart |= !ros_ip_jstr.equals(ros_ip);
         if (tango_prefix_jstr != null && tango_prefix != null) restart |= !tango_prefix_jstr.equals(tango_prefix);
-        if (namespace_jstr != null && namespace != null) restart |= !namespace_jstr.equals(namespace);
+        if (namespace_jstr != null && namespace != null) restart |= !namespace_jstr.equals(namespace);*/
+
+        if (ros_master_jstr != null && ros_master != null && ros_ip_jstr != null && ros_ip != null && tango_prefix_jstr != null && tango_prefix != null && namespace_jstr != null && namespace != null) {
+            restart = (!ros_master_jstr.equals(ros_master)) || (!ros_ip_jstr.equals(ros_ip)) || (!tango_prefix_jstr.equals(tango_prefix)) || (!namespace_jstr.equals(namespace));
+        }
 
         return restart;
     }
@@ -169,8 +173,7 @@ public class NativeStreamingActivity extends Activity {
                 intent = new Intent();
                 intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
             }
-            bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
-            tangoServiceBound = true;
+            tangoServiceBound = bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
             nativeError = false;
             TangoJniNative.onResume(this);
 
@@ -186,9 +189,10 @@ public class NativeStreamingActivity extends Activity {
     protected void onPause() {
         isPaused = isFinishing();
         TangoJniNative.onPause();
-        if (tangoServiceBound) {
-            unbindService(mTangoServiceConnection);
-        }
+        //if (tangoServiceBound) {
+        unbindService(mTangoServiceConnection);
+        tangoServiceBound = false;
+        //}
         super.onPause();
     }
 
