@@ -88,6 +88,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("NativeStreamingActivity.onCreate ","Creating NativeStreamingActivity");
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
@@ -152,7 +153,10 @@ public class NativeStreamingActivity extends Activity {
         if (needsRestart) {
             needsRestart = false;
             Intent intent = getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            Log.i("NativeStreamingActivity","Starting new activity");
             startActivity(intent);
+            Log.i("NativeStreamingActivity","Stopping old activity");
             finish();
             //System.exit(0);
         } else {

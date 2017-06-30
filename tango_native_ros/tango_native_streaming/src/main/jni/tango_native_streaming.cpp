@@ -437,16 +437,20 @@ void TangoNativeStreamingApp::OnPause() {
   LOGI("pub_thread stopped");
   // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
   // right now can only be paused, and ros settings cannot be changed unless the app is cleared from memory and relaunched.
-  if (ctxt.nh) {
+  if (ros::ok()) {
     LOGI("Shutting down ros");
-    (ctxt.nh)->shutdown();
+    //(ctxt.nh)->shutdown();
     (ctxt.nh) = nullptr;
     ros::shutdown();
     LOGI("ros stopped");
   }
-  TangoConfig_free(tango_config_);
-  tango_config_ = nullptr;
-  TangoService_disconnect();
+  //if (!error) {
+    LOGI("DISCONNECTING FROM TANGO SERVICE");
+      TangoConfig_free(tango_config_);
+      tango_config_ = nullptr;
+      TangoService_disconnect();
+    LOGI("TANGO SERVICE DISCONNECTED");
+  //}
   LOGI("Done");
 }
 
