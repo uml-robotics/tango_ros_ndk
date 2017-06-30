@@ -15,7 +15,7 @@ import java.util.List;
 
 public class SettingsActivity extends Activity {
 
-    public static String ros_master = "http://10.0.7.172:11311",
+    public static String ros_master = "http://10.0.4.20:11311",
                          ros_ip = "",
                          tango_prefix = "tango_brain_0/",
                          namespace = "tango_brain_0";
@@ -111,7 +111,7 @@ public class SettingsActivity extends Activity {
         intent.putExtra("ROS_IP", ros_ip);
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
         finish();
     }

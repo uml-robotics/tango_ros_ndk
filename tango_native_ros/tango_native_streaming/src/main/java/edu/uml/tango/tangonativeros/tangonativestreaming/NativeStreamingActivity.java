@@ -165,16 +165,16 @@ public class NativeStreamingActivity extends Activity {
             //System.exit(0);
         } else {
 
-            //Intent intent = new Intent();
-            //intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
-            //boolean success = (getPackageManager().resolveService(intent, 0) != null);
-            // Attempt old service name
-            //if (!success) {
-            //    intent = new Intent();
-            //    intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
-            //}
-            //tangoServiceBound = bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
-            //nativeError = false;
+            Intent intent = new Intent();
+            intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
+            boolean success = (getPackageManager().resolveService(intent, 0) != null);
+             //Attempt old service name
+            if (!success) {
+                intent = new Intent();
+                intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
+            }
+            tangoServiceBound = bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
+            nativeError = false;
             TangoJniNative.onResume(this);
 
             if (nativeError) {
@@ -190,7 +190,7 @@ public class NativeStreamingActivity extends Activity {
         isPaused = isFinishing();
         TangoJniNative.onPause();
         //if (tangoServiceBound) {
-//        unbindService(mTangoServiceConnection);
+        unbindService(mTangoServiceConnection);
 //        tangoServiceBound = false;
         //}
         super.onPause();
@@ -233,7 +233,7 @@ public class NativeStreamingActivity extends Activity {
         Intent i = getBaseContext().getPackageManager()
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
-        //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
     }
