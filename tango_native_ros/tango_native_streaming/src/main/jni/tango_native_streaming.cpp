@@ -71,7 +71,7 @@ namespace {
 
 // The minimum Tango Core version required from this application.
 constexpr int kTangoCoreMinimumVersion = 9377;
-
+/*
 void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *buffer)
 {
   if (id == TANGO_CAMERA_COLOR)
@@ -108,7 +108,8 @@ void onFrameAvailable(void* context, TangoCameraId id, const TangoImageBuffer *b
     }
   }
 }
-
+*/
+/*
 void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
   int ret = TangoSupport_updatePointCloud(ctxt->pc_manager, point_cloud);
@@ -121,8 +122,8 @@ void onPointCloudAvailable(void* context, const TangoPointCloud* point_cloud) {
     LOGI("SUCCESSFULLY UPDATED TANGO MANAGER");
   }
 }
-
-
+*/
+/*
 //Taken from stackoverflow: https://stackoverflow.com/questions/12469730/confusion-on-yuv-nv21-conversion-to-rgb
 void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
 
@@ -158,7 +159,8 @@ void decodeYUV420SP(uint8_t rgb[], uint8_t yuv420sp[], int width, int height) {
        }
   }
 }
-
+*/
+/*
 void onPoseAvailable(void* context, const TangoPoseData *pose) {
   tango_native_streaming::tango_context* ctxt = (tango_native_streaming::tango_context*)context;
   if (pthread_mutex_trylock(ctxt->pose_mutex_ptr) == 0)
@@ -173,42 +175,50 @@ void onPoseAvailable(void* context, const TangoPoseData *pose) {
     pthread_mutex_unlock(ctxt->pose_mutex_ptr);
   }
 }
+*/
 
 void* pub_thread_method(void* arg)
 {
     tango_native_streaming::TangoNativeStreamingApp* app;
     app = (tango_native_streaming::TangoNativeStreamingApp*) arg;
     ros::Rate rate(10);
-    TangoErrorType ret;
-    TangoPointCloud* pc_ptr;
-    TangoImageBuffer* img_ptr;
-    bool new_available;
-    bool img_size_computed = false;
-    int size;
+    //TangoErrorType ret;
+    //TangoPointCloud* pc_ptr;
+    //TangoImageBuffer* img_ptr;
+    //bool new_available;
+    //bool img_size_computed = false;
+    //int size;
     running = true;
+    error = false;
     while (running && !error)
     {
-        if (app == NULL)
-            LOGE("APP IS NULL");
-        if ((app->ctxt).pc_manager == NULL)
-            LOGE("pc_manager IS NULL");
-        ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
-        if (ret != TANGO_SUCCESS)
-        {
-            LOGE("Error %d retrieving latest pointcloud", ret);
-        }
-        if (new_available)
-        {
-            app->pc_msg.width = app->pc_msg.row_step = pc_ptr->num_points;
-            app->pc_msg.header.seq = app->seq++;
-            app->pc_msg.header.stamp = ros::Time::now();
+
+        std::stringstream ss;
+        ss << "hello world " << app->count++;
+        app->str_msg.data = ss.str();
+        LOGI("%s", app->str_msg.data.c_str());
+        app->string_pub.publish(app->str_msg);
+        //if (app == NULL)
+        //    LOGE("APP IS NULL");
+        //if ((app->ctxt).pc_manager == NULL)
+        //    LOGE("pc_manager IS NULL");
+        //ret = TangoSupport_getLatestPointCloudAndNewDataFlag((app->ctxt).pc_manager, &pc_ptr, &new_available);
+        //if (ret != TANGO_SUCCESS)
+        //{
+        //    LOGE("Error %d retrieving latest pointcloud", ret);
+        //}
+        //if (new_available)
+        //{
+  //          app->pc_msg.width = app->pc_msg.row_step = pc_ptr->num_points;
+  //          app->pc_msg.header.seq = app->seq++;
+  //          app->pc_msg.header.stamp = ros::Time::now();
             //LOGI("Header stamp: %f", app->pc_msg.header.stamp.toSec());
-            int size = 4 * sizeof(float) * pc_ptr->num_points;
-            app->pc_msg.data.resize(size);
-            memcpy(&app->pc_msg.data[0], (void*)pc_ptr->points, size);
-            app->pc_pub.publish(app->pc_msg);
-        }
-        if (app->ctxt.image_manager_ready)
+  //          int size = 4 * sizeof(float) * pc_ptr->num_points;
+  //          app->pc_msg.data.resize(size);
+  //          memcpy(&app->pc_msg.data[0], (void*)pc_ptr->points, size);
+  //          app->pc_pub.publish(app->pc_msg);
+//        }
+  /*      if (app->ctxt.image_manager_ready)
         {
             ret = TangoSupport_getLatestImageBufferAndNewDataFlag((app->ctxt).image_manager, &img_ptr, &new_available);
             if (ret != TANGO_SUCCESS)
@@ -244,14 +254,14 @@ void* pub_thread_method(void* arg)
                 }
                 app->img_pub.publish(app->img_msg);
             }
-        }
-        pthread_mutex_lock(&(app->pose_mutex));
-        app->map_to_odom.header.seq = app->map_to_odom_seq++;
-        app->odom_to_base.header.seq = app->odom_to_base_seq++;
-        app->map_to_odom.header.stamp = app->odom_to_base.header.stamp = ros::Time::now();
-        app->tf_bcaster->sendTransform(app->map_to_odom);
-        app->tf_bcaster->sendTransform(app->odom_to_base);
-        pthread_mutex_unlock(&(app->pose_mutex));
+        }*/
+        //pthread_mutex_lock(&(app->pose_mutex));
+        //app->map_to_odom.header.seq = app->map_to_odom_seq++;
+        //app->odom_to_base.header.seq = app->odom_to_base_seq++;
+        //app->map_to_odom.header.stamp = app->odom_to_base.header.stamp = ros::Time::now();
+        //app->tf_bcaster->sendTransform(app->map_to_odom);
+        //app->tf_bcaster->sendTransform(app->odom_to_base);
+        //pthread_mutex_unlock(&(app->pose_mutex));
         ros::spinOnce();
         rate.sleep();
     }
@@ -267,6 +277,7 @@ void TangoNativeStreamingApp::OnCreate(JNIEnv* env, jobject caller_activity)
   LOGI("Starting...");
 }
 
+/*
 void TangoNativeStreamingApp::SetCurrentPoseCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr& known_pose)
 {
   LOGI("Will set pose to known");
@@ -302,7 +313,8 @@ void TangoNativeStreamingApp::SetCurrentPoseCallback(const geometry_msgs::PoseWi
     pthread_mutex_unlock(&pose_mutex);
   }
 }
-
+*/
+/*
 void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binder) {
   if (!error)
   {
@@ -429,6 +441,7 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
   }
   }
 }
+*/
 
 void TangoNativeStreamingApp::OnPause() {
   running = false;
@@ -437,19 +450,19 @@ void TangoNativeStreamingApp::OnPause() {
   LOGI("pub_thread stopped");
   // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
   // right now can only be paused, and ros settings cannot be changed unless the app is cleared from memory and relaunched.
-  if (ros::ok()) {
+  if (ctxt.nh) {
     LOGI("Shutting down ros");
-    //(ctxt.nh)->shutdown();
-    (ctxt.nh) = nullptr;
+    (ctxt.nh)->shutdown();
     ros::shutdown();
+    delete ctxt.nh;
     LOGI("ros stopped");
   }
   //if (!error) {
-    LOGI("DISCONNECTING FROM TANGO SERVICE");
-      TangoConfig_free(tango_config_);
-      tango_config_ = nullptr;
-      TangoService_disconnect();
-    LOGI("TANGO SERVICE DISCONNECTED");
+//    LOGI("DISCONNECTING FROM TANGO SERVICE");
+//      TangoConfig_free(tango_config_);
+//      tango_config_ = nullptr;
+//      TangoService_disconnect();
+//    LOGI("TANGO SERVICE DISCONNECTED");
   //}
   LOGI("Done");
 }
@@ -504,7 +517,7 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
    strcpy(tango_pose, tango_prefix);
    strcat(tango_pose, TANGO_POSE_SUFFIX);
 
-  int seq = 0;
+/*  int seq = 0;
   sensor_msgs::PointField x, y, z, c;
   x.name = "x";
   y.name = "y";
@@ -543,6 +556,7 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
       LOGI("Successfully created point cloud manager, with %d max point cloud elements", max_point_cloud_elements);
       LOGI("PC Manager address = %d", &(ctxt.pc_manager));
   }
+  */
 
   int argc = 3;
   char *argv[] = {"nothing_important" , ros_master_uri, ros_ip_uri};
@@ -565,10 +579,11 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
       LOGI("ROS MASTER IS UP!");
 
       LOGI("%s", master_uri.c_str());
-      ctxt.pose_mutex_ptr = &pose_mutex;
-      ctxt.odom_to_base_ptr = &odom_to_base;
+//      ctxt.pose_mutex_ptr = &pose_mutex;
+//      ctxt.odom_to_base_ptr = &odom_to_base;
       ctxt.nh = new ros::NodeHandle(tango_namespace);
-      ctxt.image_manager_ready = false;
+      string_pub = (ctxt.nh)->advertise<std_msgs::String>("debug_chatter", 1000);
+/*      ctxt.image_manager_ready = false;
       tf_bcaster = new tf2_ros::TransformBroadcaster;
       static_tf_bcaster = new tf2_ros::StaticTransformBroadcaster;
       tf_buffer = new tf2_ros::Buffer;
@@ -615,6 +630,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
             " of date.");
         std::exit(EXIT_SUCCESS);
       }
+      */
+    pthread_create(&pub_thread, NULL, pub_thread_method, (void*)this);
   } else {
         LOGI("NO ROS MASTER.");
         //std::exit(EXIT_SUCCESS);

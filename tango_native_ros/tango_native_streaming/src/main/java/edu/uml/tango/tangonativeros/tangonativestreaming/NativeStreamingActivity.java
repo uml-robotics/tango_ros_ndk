@@ -77,7 +77,7 @@ public class NativeStreamingActivity extends Activity {
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder service) {
-            TangoJniNative.onTangoServiceConnected(service);
+//            TangoJniNative.onTangoServiceConnected(service);
         }
 
         public void onServiceDisconnected(ComponentName name) {
@@ -88,7 +88,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i("NativeStreamingActivity.onCreate ","Creating NativeStreamingActivity");
+        Log.i("NativeStreamingActivity","Creating NativeStreamingActivity");
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
@@ -114,15 +114,15 @@ public class NativeStreamingActivity extends Activity {
     boolean hasConfigChanged() {
         boolean restart = false;
 
-        /*restart |= ros_master_jstr == null;
+/*        restart |= ros_master_jstr == null;
         restart |= ros_ip_jstr == null;
         restart |= tango_prefix_jstr == null;
         restart |= namespace_jstr == null;
         if (ros_master_jstr != null && ros_master != null) restart |= !ros_master_jstr.equals(ros_master);
         if (ros_ip_jstr != null && ros_ip != null) restart |= !ros_ip_jstr.equals(ros_ip);
         if (tango_prefix_jstr != null && tango_prefix != null) restart |= !tango_prefix_jstr.equals(tango_prefix);
-        if (namespace_jstr != null && namespace != null) restart |= !namespace_jstr.equals(namespace);*/
-
+        if (namespace_jstr != null && namespace != null) restart |= !namespace_jstr.equals(namespace);
+*/
         if (ros_master_jstr != null && ros_master != null && ros_ip_jstr != null && ros_ip != null && tango_prefix_jstr != null && tango_prefix != null && namespace_jstr != null && namespace != null) {
             restart = (!ros_master_jstr.equals(ros_master)) || (!ros_ip_jstr.equals(ros_ip)) || (!tango_prefix_jstr.equals(tango_prefix)) || (!namespace_jstr.equals(namespace));
         }
@@ -165,16 +165,16 @@ public class NativeStreamingActivity extends Activity {
             //System.exit(0);
         } else {
 
-            Intent intent = new Intent();
-            intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
-            boolean success = (getPackageManager().resolveService(intent, 0) != null);
+            //Intent intent = new Intent();
+            //intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
+            //boolean success = (getPackageManager().resolveService(intent, 0) != null);
             // Attempt old service name
-            if (!success) {
-                intent = new Intent();
-                intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
-            }
-            tangoServiceBound = bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
-            nativeError = false;
+            //if (!success) {
+            //    intent = new Intent();
+            //    intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
+            //}
+            //tangoServiceBound = bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
+            //nativeError = false;
             TangoJniNative.onResume(this);
 
             if (nativeError) {
@@ -190,8 +190,8 @@ public class NativeStreamingActivity extends Activity {
         isPaused = isFinishing();
         TangoJniNative.onPause();
         //if (tangoServiceBound) {
-        unbindService(mTangoServiceConnection);
-        tangoServiceBound = false;
+//        unbindService(mTangoServiceConnection);
+//        tangoServiceBound = false;
         //}
         super.onPause();
     }
@@ -233,7 +233,7 @@ public class NativeStreamingActivity extends Activity {
         Intent i = getBaseContext().getPackageManager()
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
     }

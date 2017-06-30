@@ -80,6 +80,12 @@ class TangoNativeStreamingApp {
   ros::Publisher pc_pub;
   ros::Publisher img_pub;
   ros::Subscriber known_pose_sub;
+
+// TODO FOR DEBUGING PURPOSES
+  int count = 0;
+  ros::Publisher string_pub;
+  std_msgs::String str_msg;
+
   sensor_msgs::PointCloud2 pc_msg;
   sensor_msgs::Image img_msg;
   tango_context ctxt;
@@ -116,13 +122,13 @@ class TangoNativeStreamingApp {
 
   void OnCreate(JNIEnv* env, jobject caller_activity);
 
-  void OnTangoServiceConnected(JNIEnv* env, jobject binder);
+//  void OnTangoServiceConnected(JNIEnv* env, jobject binder);
 
   void OnPause();
 
   void OnResume(JNIEnv* env, jobject caller_activity);
 
-  void SetCurrentPoseCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr&);
+//  void SetCurrentPoseCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr&);
 
  private:
   TangoConfig tango_config_;

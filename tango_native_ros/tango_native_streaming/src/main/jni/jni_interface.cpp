@@ -60,10 +60,10 @@ Java_edu_uml_tango_tangonativeros_tangonativestreaming_TangoJniNative_onCreate(J
   app.OnCreate(env, caller_activity);
 }
 
-JNIEXPORT void JNICALL
-Java_edu_uml_tango_tangonativeros_tangonativestreaming_TangoJniNative_onTangoServiceConnected(JNIEnv* env, jobject, jobject binder) {
-  app.OnTangoServiceConnected(env, binder);
-}
+//JNIEXPORT void JNICALL
+//Java_edu_uml_tango_tangonativeros_tangonativestreaming_TangoJniNative_onTangoServiceConnected(JNIEnv* env, jobject, jobject binder) {
+//  app.OnTangoServiceConnected(env, binder);
+//}
 
 JNIEXPORT void JNICALL
 Java_edu_uml_tango_tangonativeros_tangonativestreaming_TangoJniNative_onPause(JNIEnv*, jobject) {
