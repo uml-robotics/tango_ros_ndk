@@ -195,7 +195,7 @@ public class SettingsActivity extends Activity {
         intent.putExtra("ROS_IP", ros_ip);
         intent.putExtra("TANGO_PREFIX", tango_prefix);
         intent.putExtra("NAMESPACE", namespace);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

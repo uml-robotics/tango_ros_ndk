@@ -74,23 +74,7 @@ public class NativeStreamingActivity extends Activity {
                    tango_service_bound = false;
 
     // Tango Service connection.
-    ServiceConnection mTangoServiceConnection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            TangoJniNative.onTangoServiceConnected(service);
-            tango_service_bound = true;
-            Log.i("Tango Service bound", "");
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-            // Handle this if you need to gracefully shutdown/retry
-            // in the event that Tango itself crashes/gets upgraded while running.
-            tango_service_bound = false;
-            Log.i("Tango Service unbound","");
-        }
-
-
-    };
+    ServiceConnection mTangoServiceConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,11 +112,6 @@ public class NativeStreamingActivity extends Activity {
         if (ros_ip_jstr != null && ros_ip != null) restart |= !ros_ip_jstr.equals(ros_ip);
         if (tango_prefix_jstr != null && tango_prefix != null) restart |= !tango_prefix_jstr.equals(tango_prefix);
         if (namespace_jstr != null && namespace != null) restart |= !namespace_jstr.equals(namespace);
-
-
-        /*if (ros_master_jstr != null || ros_ip_jstr != null || tango_prefix_jstr != null || namespace_jstr != null) {
-            restart = (ros_master_jstr != ros_master) || (ros_ip_jstr != ros_ip) || (tango_prefix_jstr != tango_prefix) || (namespace_jstr != namespace);
-        }*/
         return restart;
     }
 
@@ -152,6 +131,26 @@ public class NativeStreamingActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (!isPaused) {
+
+            mTangoServiceConnection = null;
+
+            mTangoServiceConnection = new ServiceConnection() {
+
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    TangoJniNative.onTangoServiceConnected(service);
+                    tango_service_bound = true;
+                    Log.i("Tango Service bound", "");
+                }
+
+                public void onServiceDisconnected(ComponentName name) {
+                    // Handle this if you need to gracefully shutdown/retry
+                    // in the event that Tango itself crashes/gets upgraded while running.
+                    tango_service_bound = false;
+                    Log.i("Tango Service unbound","");
+                }
+
+
+            };
 
             needsRestart = hasConfigChanged();
 
@@ -249,7 +248,7 @@ public class NativeStreamingActivity extends Activity {
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
         i.putExtra("IS_PAUSED", false);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
         System.exit(0);
