@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">Tango Native ROS Streaming</string>
     <string name="app_name_long">Tango Native ROS (Pose and Depth) Streaming</string>
-    <string name="text_message">Started Streaming!</string>
+    <string name="STREAM_CONNECTING">Attempting to connect to the ROS Master...</string>
+    <string name="STREAM_SUCCESS">Started Streaming!</string>
     <string name="ROS_MASTER_LBL">ROS Master URI</string>
     <string name="ROS_NODE_LBL">ROS Node IPv4 Address</string>
     <string name="ROS_PREFIX_LBL">ROS Prefix</string>

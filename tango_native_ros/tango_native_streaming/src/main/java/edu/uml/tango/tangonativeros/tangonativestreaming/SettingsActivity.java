@@ -36,6 +36,18 @@ public class SettingsActivity extends Activity {
     ToggleUI namespaceCompentent;
 
     @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        overridePendingTransition(0,0);
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        overridePendingTransition(0,0);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

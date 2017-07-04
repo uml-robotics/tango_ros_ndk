@@ -68,7 +68,8 @@ public class NativeStreamingActivity extends Activity {
     public static String ros_master, ros_ip, tango_prefix, namespace,
                     ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
 
-    public boolean isPaused = false,
+    public boolean hasErrored = false,
+                   wasPaused = false,
                    needsRestart = false,
                    nativeError = false,
                    tango_service_bound = false;
@@ -79,6 +80,7 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_depth_perception);
         if (savedInstanceState != null) {
             ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
             ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
@@ -88,17 +90,16 @@ public class NativeStreamingActivity extends Activity {
             ros_ip = savedInstanceState.getString("ROS_IP");
             tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
             namespace = savedInstanceState.getString("NAMESPACE");
-            isPaused = savedInstanceState.getBoolean("IS_PAUSED");
+            hasErrored = savedInstanceState.getBoolean("HAS_ERRORED");
         } else {
             Intent intent = getIntent();
             ros_master = intent.getStringExtra("ROS_MASTER");
             ros_ip = intent.getStringExtra("ROS_IP");
             tango_prefix = intent.getStringExtra("TANGO_PREFIX");
             namespace = intent.getStringExtra("NAMESPACE");
-            isPaused = intent.getBooleanExtra("IS_PAUSED", false);
+            hasErrored = intent.getBooleanExtra("HAS_ERRORED", false);
         }
 
-        setContentView(R.layout.activity_depth_perception);
         TangoJniNative.onCreate(this);
     }
 
@@ -116,8 +117,17 @@ public class NativeStreamingActivity extends Activity {
     }
 
     @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        overridePendingTransition(0,0);
+    }
+
+    @Override
     protected void onRestart() {
         super.onRestart();
+        wasPaused = true;
+        overridePendingTransition(0,0);
+        //stopStreaming(null);
     }
 
     @Override
@@ -130,7 +140,7 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!isPaused) {
+        if (!hasErrored) {
 
             mTangoServiceConnection = null;
 
@@ -159,6 +169,21 @@ public class NativeStreamingActivity extends Activity {
             tango_prefix_jstr = tango_prefix;
             namespace_jstr = namespace;
 
+            if (wasPaused) {
+                wasPaused = false;
+                Intent intent = new Intent(this, NativeStreamingActivity.class);
+                intent.putExtra("ROS_MASTER", ros_master);
+                intent.putExtra("ROS_IP", ros_ip);
+                intent.putExtra("TANGO_PREFIX", tango_prefix);
+                intent.putExtra("NAMESPACE", namespace);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                System.exit(0);
+            }
+
             if (needsRestart) {
                 needsRestart = false;
                 Intent intent = getIntent();
@@ -183,12 +208,14 @@ public class NativeStreamingActivity extends Activity {
                     Log.i("Native Error", "");
                     nativeError = false;
                     intent = getIntent();
-                    intent.putExtra("IS_PAUSED", true);
+                    intent.putExtra("HAS_ERRORED", true);
                     startActivity(intent);
                     finish();
                     System.exit(0);
                 }
             }
+            TextView msg = (TextView) findViewById(R.id.STREAM_STATE_LBL);
+            msg.setText(R.string.STREAM_SUCCESS);
         } else {
             TextView msg = (TextView) findViewById(R.id.STREAM_STATE_LBL);
             msg.setText(R.string.STREAM_ERR);
@@ -198,7 +225,7 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        isPaused = nativeError;
+        hasErrored = nativeError;
         TangoJniNative.onPause();
         try {
             if (tango_service_bound && mTangoServiceConnection != null) {
@@ -212,7 +239,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBoolean("IS_PAUSED", isPaused);
+        savedInstanceState.putBoolean("HAS_ERRORED", hasErrored);
         savedInstanceState.putString("ROS_MASTER_JSTR", ros_master_jstr);
         savedInstanceState.putString("ROS_IP_JSTR", ros_ip_jstr);
         savedInstanceState.putString("TANGO_PREFIX_JSTR", tango_prefix_jstr);
@@ -227,7 +254,7 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        isPaused = savedInstanceState.getBoolean("IS_PAUSED");
+        hasErrored = savedInstanceState.getBoolean("HAS_ERRORED");
         ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
         ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
         tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX_JSTR");
@@ -240,6 +267,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         stopStreaming(null);
     }
 
@@ -247,7 +275,7 @@ public class NativeStreamingActivity extends Activity {
         Intent i = getBaseContext().getPackageManager()
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
-        i.putExtra("IS_PAUSED", false);
+        i.putExtra("HAS_ERRORED", false);
         //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
