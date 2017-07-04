@@ -66,6 +66,7 @@ char ros_master[256],
      tango_pose[256];
 
      static bool running = false;
+     bool error = false;
 
 namespace {
 
@@ -425,21 +426,34 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
 }
 
 void TangoNativeStreamingApp::OnPause() {
-  LOGI("Shutting down ros");
-  running = false;
-  LOGI("Stopping pub_thread");
-  pthread_join(pub_thread, NULL);
-  LOGI("pub_thread stopped");
-  // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
-  // right now can only be paused, and ros settings cannot be changed unless the app is cleared from memory and relaunched.
-  (ctxt.nh)->shutdown();
-  (ctxt.nh) = nullptr;
-  ros::shutdown();
-  LOGI("ros stopped");
-  TangoConfig_free(tango_config_);
-  tango_config_ = nullptr;
-  TangoService_disconnect();
-  LOGI("Done");
+   LOGI("Stopping streaming");
+     if (pub_thread != NULL) {
+     running = false;
+     LOGI("Stopping pub_thread");
+     pthread_join(pub_thread, NULL);
+     LOGI("pub_thread stopped");
+     }
+     // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
+     // right now can only be paused, and ros settings cannot be changed unless the app is cleared from memory and relaunched.
+     if (ctxt.nh) {
+     //(ctxt.nh)->shutdown();
+     (ctxt.nh) = nullptr;
+     }
+     if (ros::ok()) {
+     LOGI("Shutting down ros");
+     ros::shutdown();
+     LOGI("ros stopped");
+     }
+     if (tango_config_) {
+     LOGI("Disconnecting tango service");
+     TangoConfig_free(tango_config_);
+   //  delete tango_config_;
+     tango_config_ = nullptr;
+     TangoService_disconnect();
+     LOGI("Tango service disconnected");
+     }
+     LOGI("Streaming stopped");
+     LOGI("Done");
 }
 
 //TODO: Run ROS initialization on separate thread so Android does not complain
@@ -452,7 +466,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
    jfieldID fidMaster = (*env).GetStaticFieldID(thisClass, "ros_master_jstr", "Ljava/lang/String;"),
             fidRosIp = (*env).GetStaticFieldID(thisClass, "ros_ip_jstr", "Ljava/lang/String;"),
             fidPrefix = (*env).GetStaticFieldID(thisClass, "tango_prefix_jstr", "Ljava/lang/String;"),
-            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;");
+            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;"),
+            fidError = (*env).GetFieldID(thisClass, "nativeError", "Z");
 
    jstring js_ros_master = (jstring)env->GetStaticObjectField(thisClass, fidMaster),
            js_ros_ip = (jstring)env->GetStaticObjectField(thisClass, fidRosIp),
@@ -549,9 +564,7 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
 
   if(ros::master::check()){
       LOGI("ROS MASTER IS UP!");
-  } else {
-      LOGI("NO ROS MASTER.");
-  }
+
   LOGI("%s", master_uri.c_str());
   ctxt.pose_mutex_ptr = &pose_mutex;
   ctxt.odom_to_base_ptr = &odom_to_base;
@@ -603,5 +616,14 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
         " of date.");
     std::exit(EXIT_SUCCESS);
   }
+  } else {
+  LOGI("NO ROS MASTER.");
+          //std::exit(EXIT_SUCCESS);
+          jfieldID fidErr = env->GetFieldID(thisClass, "nativeError", "Z");
+          jboolean err = true;
+          env->SetBooleanField(caller_activity, fidErr, err);
+          error = true;
+          return;
+          }
 }
 }  // namespace
