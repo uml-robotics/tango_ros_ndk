@@ -11,14 +11,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ROS_MASTER_LBL" />
-
-        <EditText
-            android:id="@+id/MASTER_IP_EDIT"
+        <Spinner
+            android:id="@+id/MASTER_IP_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textUri"
-            android:text="Name" />
+            android:ems="10"/>
+        <EditText
+            android:id="@+id/MASTER_IP_EDIT"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:inputType="textUri" />
+        <Button
+            android:id="@+id/TOGGLE_MASTER_IP_BTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="toggleMasterIP"
+            android:text="@string/button_toggle_master_ip" />
     </TableRow>
 
     <TableRow
@@ -30,14 +40,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ROS_NODE_LBL" />
-
-        <EditText
-            android:id="@+id/NODE_IP_EDIT"
+        <Spinner
+            android:id="@+id/ROS_NODE_IP_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textUri"
-            android:text="Name" />
+            android:ems="10"/>
+        <EditText
+            android:id="@+id/ROS_NODE_IP_EDIT"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:inputType="textUri" />
+        <Button
+            android:id="@+id/TOGGLE_ROS_NODE_IP_BTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="toggleRosNodeIP"
+            android:text="@string/button_toggle_node_ip" />
     </TableRow>
 
     <TableRow
@@ -49,14 +69,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ROS_PREFIX_LBL" />
-
-        <EditText
-            android:id="@+id/PREFIX_EDIT"
+        <Spinner
+            android:id="@+id/ROS_PREFIX_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textUri"
-            android:text="Name" />
+            android:ems="10"/>
+        <EditText
+            android:id="@+id/ROS_PREFIX_EDIT"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:inputType="textUri" />
+        <Button
+            android:id="@+id/TOGGLE_ROS_PREFIX_BTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="toggleRosPrefix"
+            android:text="@string/button_toggle_ros_prefix" />
     </TableRow>
 
     <TableRow
@@ -68,14 +98,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ROS_NAMESPACE_LBL" />
-
-        <EditText
-            android:id="@+id/NAMESPACE_EDIT"
+        <Spinner
+            android:id="@+id/NAMESPACE_SPINNER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textUri"
-            android:text="Name" />
+            android:ems="10"/>
+        <EditText
+            android:id="@+id/NAMESPACE_EDIT"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:inputType="textUri" />
+        <Button
+            android:id="@+id/TOGGLE_NAMESPACE_BTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="toggleNewNamespace"
+            android:text="@string/button_toggle_namespace" />
     </TableRow>
 
     <TableRow
@@ -88,5 +128,12 @@
             android:layout_height="wrap_content"
             android:onClick="startStreaming"
             android:text="@string/START_BTN" />
+
+        <TextView
+            android:id="@+id/ERR_NO_MASTER_LBL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ERR_NO_MASTER_LBL"
+            android:visibility="invisible" />
     </TableRow>
 </TableLayout>

@@ -186,7 +186,7 @@ void* pub_thread_method(void* arg)
     bool img_size_computed = false;
     int size;
     running = true;
-    while (running)
+    while (running && !error)
     {
         if (app == NULL)
             LOGE("APP IS NULL");
@@ -304,6 +304,8 @@ void TangoNativeStreamingApp::SetCurrentPoseCallback(const geometry_msgs::PoseWi
 }
 
 void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binder) {
+  if (!error)
+  {
   if (TangoService_setBinder(env, binder) != TANGO_SUCCESS) {
     LOGE(
         "TangoNativeStreamingApp::OnTangoServiceConnected,"
@@ -421,7 +423,11 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
   static_tf_bcaster->sendTransform(base_to_pose);
   static_tf_bcaster->sendTransform(base_to_depth);
   static_tf_bcaster->sendTransform(base_to_color);
-  pthread_create(&pub_thread, NULL, pub_thread_method, (void*)this);
+  if (!error)
+  {
+    pthread_create(&pub_thread, NULL, pub_thread_method, (void*)this);
+  }
+  }
 }
 
 void TangoNativeStreamingApp::OnPause() {
@@ -561,7 +567,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
   // %Tag(ROS_MASTER)%
   std::string master_uri = ros::master::getURI();
 
-  if(ros::master::check()){
+  if(ros::master::check())
+  {
       LOGI("ROS MASTER IS UP!");
 
   LOGI("%s", master_uri.c_str());

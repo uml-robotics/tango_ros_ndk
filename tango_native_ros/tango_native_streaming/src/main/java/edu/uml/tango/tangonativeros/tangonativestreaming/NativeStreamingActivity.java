@@ -73,6 +73,10 @@ public class NativeStreamingActivity extends Activity {
                    nativeError = false,
                    tango_service_bound = false;
 
+    public boolean nativeError = false;
+
+    public boolean tangoServiceBound = false;
+
     // Tango Service connection.
     ServiceConnection mTangoServiceConnection = new ServiceConnection() {
 
