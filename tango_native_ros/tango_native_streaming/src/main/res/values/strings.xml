@@ -9,7 +9,6 @@
     <string name="ROS_NAMESPACE_LBL">ROS Namespace</string>
     <string name="START_BTN">Start ROS Node</string>
     <string name="tango_addr_error">Unable to determine IP Address</string>
-    <string name="STOP_BTN">Stop Streaming</string>
-    <string name="ROS_PORT_LBL">Port</string>
-    <string name="ROS_MASTER_PREFIX_LBL">ROS Master Prefix</string>
+    <string name="STOP_BTN">Settings</string>
+    <string name="STREAM_ERR">Unable to contact ROS master</string>
 </resources>
