@@ -267,7 +267,8 @@ public class SettingsActivity extends Activity {
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
             line = in.readLine();
             while (line != null) {
-                str.add(line);
+                if (!str.contains(line))
+                    str.add(line);
                 line = in.readLine();
             }
             in.close();
@@ -278,28 +279,31 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    public void writeFile(String fileName, List<String> str, String newString){
+    public void writeFile(String fileName, List<String> str, String newString) {
         int index;
+
+        if (!str.contains(newString)) {
+            str.add(newString);
 
             //Removes the oldest ip to make space for the new one
             while (str.size() >= 5) {
                 str.remove(0);
             }
-            str.add(newString);
+
 
             try {
                 FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
 
-                for(index = 0; index < str.size(); index ++) {
+                for (index = 0; index < str.size(); index++) {
                     fos.write(str.get(index).getBytes());
                     fos.write(System.getProperty("line.separator").getBytes());
                 }
                 fos.close();
-            }
-            catch (Throwable t) {
-                Log.e("Write File Error","");
+            } catch (Throwable t) {
+                Log.e("Write File Error", "");
             }
         }
+    }
 
     public void updateOrder(String fileName, List<String> str, String newString) {
         int index;
