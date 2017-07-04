@@ -21,7 +21,6 @@
     <string name="button_toggle_namespace">Set New Namespace</string>
     <string name="backToList">Back to list</string>
     <string name="ERR_NO_MASTER_LBL">Error: No ROS Master found</string>
-    <string name="STREAM_ERR">Error: Unable to contact ROS master</string>
     <string name="defaultPrefix">tango_brain_0/</string>
     <string name="defaultNamespace">tango_brain_0</string>
     <string name="tangoAddrError">tango_addr_error</string>
