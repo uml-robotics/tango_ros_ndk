@@ -68,27 +68,19 @@ public class NativeStreamingActivity extends Activity {
     public static String ros_master, ros_ip, tango_prefix, namespace,
                     ros_master_jstr, ros_ip_jstr, tango_prefix_jstr, namespace_jstr;
 
-    public boolean isPaused = false, needsRestart = false;
-
-    public boolean nativeError = false;
-
-    public boolean tangoServiceBound = false;
+    public boolean hasErrored = false,
+                   wasPaused = false,
+                   needsRestart = false,
+                   nativeError = false,
+                   tango_service_bound = false;
 
     // Tango Service connection.
-    ServiceConnection mTangoServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            TangoJniNative.onTangoServiceConnected(service);
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-            // Handle this if you need to gracefully shutdown/retry
-            // in the event that Tango itself crashes/gets upgraded while running.
-        }
-    };
+    ServiceConnection mTangoServiceConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_depth_perception);
         if (savedInstanceState != null) {
             ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
             ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
@@ -98,29 +90,44 @@ public class NativeStreamingActivity extends Activity {
             ros_ip = savedInstanceState.getString("ROS_IP");
             tango_prefix = savedInstanceState.getString("TANGO_PREFIX");
             namespace = savedInstanceState.getString("NAMESPACE");
+            hasErrored = savedInstanceState.getBoolean("HAS_ERRORED");
         } else {
             Intent intent = getIntent();
             ros_master = intent.getStringExtra("ROS_MASTER");
             ros_ip = intent.getStringExtra("ROS_IP");
             tango_prefix = intent.getStringExtra("TANGO_PREFIX");
             namespace = intent.getStringExtra("NAMESPACE");
+            hasErrored = intent.getBooleanExtra("HAS_ERRORED", false);
         }
 
-        setContentView(R.layout.activity_depth_perception);
         TangoJniNative.onCreate(this);
     }
 
     boolean hasConfigChanged() {
         boolean restart = false;
-        if (ros_master_jstr != null && ros_master != null && ros_ip_jstr != null && ros_ip != null && tango_prefix_jstr != null && tango_prefix != null && namespace_jstr != null && namespace != null) {
-            restart = (!ros_master_jstr.equals(ros_master)) || (!ros_ip_jstr.equals(ros_ip)) || (!tango_prefix_jstr.equals(tango_prefix)) || (!namespace_jstr.equals(namespace));
-        }
+        restart |= ros_master_jstr == null;
+        restart |= ros_ip_jstr == null;
+        restart |= tango_prefix_jstr == null;
+        restart |= namespace_jstr == null;
+        if (ros_master_jstr != null && ros_master != null) restart |= !ros_master_jstr.equals(ros_master);
+        if (ros_ip_jstr != null && ros_ip != null) restart |= !ros_ip_jstr.equals(ros_ip);
+        if (tango_prefix_jstr != null && tango_prefix != null) restart |= !tango_prefix_jstr.equals(tango_prefix);
+        if (namespace_jstr != null && namespace != null) restart |= !namespace_jstr.equals(namespace);
         return restart;
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        overridePendingTransition(0,0);
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        wasPaused = true;
+        overridePendingTransition(0,0);
+        //stopStreaming(null);
     }
 
     @Override
@@ -132,59 +139,107 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     protected void onResume() {
-
         super.onResume();
+        if (!hasErrored) {
 
-        needsRestart = hasConfigChanged();
+            mTangoServiceConnection = null;
 
-        ros_master_jstr = ros_master;
-        ros_ip_jstr = ros_ip;
-        tango_prefix_jstr = tango_prefix;
-        namespace_jstr = namespace;
+            mTangoServiceConnection = new ServiceConnection() {
+
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    TangoJniNative.onTangoServiceConnected(service);
+                    tango_service_bound = true;
+                    Log.i("Tango Service bound", "");
+                }
+
+                public void onServiceDisconnected(ComponentName name) {
+                    // Handle this if you need to gracefully shutdown/retry
+                    // in the event that Tango itself crashes/gets upgraded while running.
+                    tango_service_bound = false;
+                    Log.i("Tango Service unbound","");
+                }
 
 
+            };
 
-        if (needsRestart) {
-            needsRestart = false;
-            Intent intent = getIntent();
-            startActivity(intent);
-            finish();
-            //System.exit(0);
+            needsRestart = hasConfigChanged();
+
+            ros_master_jstr = ros_master;
+            ros_ip_jstr = ros_ip;
+            tango_prefix_jstr = tango_prefix;
+            namespace_jstr = namespace;
+
+            if (wasPaused) {
+                wasPaused = false;
+                Intent intent = new Intent(this, NativeStreamingActivity.class);
+                intent.putExtra("ROS_MASTER", ros_master);
+                intent.putExtra("ROS_IP", ros_ip);
+                intent.putExtra("TANGO_PREFIX", tango_prefix);
+                intent.putExtra("NAMESPACE", namespace);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                System.exit(0);
+            }
+
+            if (needsRestart) {
+                needsRestart = false;
+                Intent intent = getIntent();
+                startActivity(intent);
+                finish();
+                //System.exit(0);
+                Log.i("How did I get here?", "");
+            } else {
+
+                Intent intent = new Intent();
+                intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
+                boolean success = (getPackageManager().resolveService(intent, 0) != null);
+                // Attempt old service name
+                if (!success) {
+                    intent = new Intent();
+                    intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
+                }
+                getApplicationContext().bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
+                TangoJniNative.onResume(this);
+
+                if (nativeError) {
+                    Log.i("Native Error", "");
+                    nativeError = false;
+                    intent = getIntent();
+                    intent.putExtra("HAS_ERRORED", true);
+                    startActivity(intent);
+                    finish();
+                    System.exit(0);
+                }
+            }
+            TextView msg = (TextView) findViewById(R.id.STREAM_STATE_LBL);
+            msg.setText(R.string.STREAM_SUCCESS);
         } else {
-            Intent intent = new Intent();
-            intent.setClassName("com.google.tango", "com.google.atap.tango.TangoService");
-            boolean success = (getPackageManager().resolveService(intent, 0) != null);
-            // Attempt old service name
-            if (!success) {
-                intent = new Intent();
-                intent.setClassName("com.projecttango.tango", "com.google.atap.tango.TangoService");
-            }
-            bindService(intent, mTangoServiceConnection, BIND_AUTO_CREATE);
-            tangoServiceBound = true;
-
-            TangoJniNative.onResume(this);
-
-            if (nativeError) {
-                TextView msg = (TextView) findViewById(R.id.STREAM_STATE_LBL);
-                msg.setText(R.string.STREAM_ERR);
-                //finish();
-            }
+            TextView msg = (TextView) findViewById(R.id.STREAM_STATE_LBL);
+            msg.setText(R.string.STREAM_ERR);
         }
     }
 
     @Override
     protected void onPause() {
-        isPaused = isFinishing();
-        TangoJniNative.onPause();
-        if (tangoServiceBound) {
-            unbindService(mTangoServiceConnection);
-        }
         super.onPause();
+        hasErrored = nativeError;
+        TangoJniNative.onPause();
+        try {
+            if (tango_service_bound && mTangoServiceConnection != null) {
+                getApplicationContext().unbindService(mTangoServiceConnection);
+                mTangoServiceConnection = null;
+            }
+        } catch (Throwable e) {
+            Log.e(e.toString(), "");
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBoolean("IS_PAUSED", isPaused);
+        savedInstanceState.putBoolean("HAS_ERRORED", hasErrored);
         savedInstanceState.putString("ROS_MASTER_JSTR", ros_master_jstr);
         savedInstanceState.putString("ROS_IP_JSTR", ros_ip_jstr);
         savedInstanceState.putString("TANGO_PREFIX_JSTR", tango_prefix_jstr);
@@ -199,7 +254,7 @@ public class NativeStreamingActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        isPaused = savedInstanceState.getBoolean("IS_PAUSED");
+        hasErrored = savedInstanceState.getBoolean("HAS_ERRORED");
         ros_master_jstr = savedInstanceState.getString("ROS_MASTER_JSTR");
         ros_ip_jstr = savedInstanceState.getString("ROS_IP_JSTR");
         tango_prefix_jstr = savedInstanceState.getString("TANGO_PREFIX_JSTR");
@@ -212,6 +267,7 @@ public class NativeStreamingActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         stopStreaming(null);
     }
 
@@ -219,8 +275,10 @@ public class NativeStreamingActivity extends Activity {
         Intent i = getBaseContext().getPackageManager()
                 .getLaunchIntentForPackage( getBaseContext().getPackageName() );
         i.putExtras(getIntent());
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.putExtra("HAS_ERRORED", false);
+        //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
+        System.exit(0);
     }
 }

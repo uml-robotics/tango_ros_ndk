@@ -431,27 +431,34 @@ void TangoNativeStreamingApp::OnTangoServiceConnected(JNIEnv* env, jobject binde
 }
 
 void TangoNativeStreamingApp::OnPause() {
-  running = false;
-  LOGI("Stopping pub_thread");
-  pthread_join(pub_thread, NULL);
-  LOGI("pub_thread stopped");
-  // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
-  // right now can only be paused, and ros settings cannot be changed unless the app is cleared from memory and relaunched.
-  if (ros::ok())
-  {
-    LOGI("Shutting down ros");
-    if ((ctxt.nh))
-    {
-    (ctxt.nh)->shutdown();
-    (ctxt.nh) = nullptr;
-    ros::shutdown();
-    }
-    LOGI("ros stopped");
-  }
-  TangoConfig_free(tango_config_);
-  tango_config_ = nullptr;
-  TangoService_disconnect();
-  LOGI("Done");
+   LOGI("Stopping streaming");
+     if (pub_thread != NULL) {
+     running = false;
+     LOGI("Stopping pub_thread");
+     pthread_join(pub_thread, NULL);
+     LOGI("pub_thread stopped");
+     }
+     // TODO figure out a way to stop the ros node such that it can then be reinitalized to connect to a different master
+     // right now can only be paused, and ros settings cannot be changed unless the app is cleared from memory and relaunched.
+     if (ctxt.nh) {
+     (ctxt.nh)->shutdown();
+     (ctxt.nh) = nullptr;
+     }
+     if (ros::ok()) {
+     LOGI("Shutting down ros");
+     ros::shutdown();
+     LOGI("ros stopped");
+     }
+     if (tango_config_) {
+     LOGI("Disconnecting tango service");
+     TangoConfig_free(tango_config_);
+   //  delete tango_config_;
+     tango_config_ = nullptr;
+     TangoService_disconnect();
+     LOGI("Tango service disconnected");
+     }
+     LOGI("Streaming stopped");
+     LOGI("Done");
 }
 
 //TODO: Run ROS initialization on separate thread so Android does not complain
@@ -464,8 +471,8 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
    jfieldID fidMaster = (*env).GetStaticFieldID(thisClass, "ros_master_jstr", "Ljava/lang/String;"),
             fidRosIp = (*env).GetStaticFieldID(thisClass, "ros_ip_jstr", "Ljava/lang/String;"),
             fidPrefix = (*env).GetStaticFieldID(thisClass, "tango_prefix_jstr", "Ljava/lang/String;"),
-            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;");
-            //fidError = (*env).GetFieldID(thisClass, "nativeError", "Z");
+            fidNamespace = (*env).GetStaticFieldID(thisClass, "namespace_jstr", "Ljava/lang/String;"),
+            fidError = (*env).GetFieldID(thisClass, "nativeError", "Z");
 
    jstring js_ros_master = (jstring)env->GetStaticObjectField(thisClass, fidMaster),
            js_ros_ip = (jstring)env->GetStaticObjectField(thisClass, fidRosIp),
@@ -564,65 +571,65 @@ void TangoNativeStreamingApp::OnResume(JNIEnv* env, jobject caller_activity) {
   {
       LOGI("ROS MASTER IS UP!");
 
-      LOGI("%s", master_uri.c_str());
-      ctxt.pose_mutex_ptr = &pose_mutex;
-      ctxt.odom_to_base_ptr = &odom_to_base;
-      ctxt.nh = new ros::NodeHandle(tango_namespace);
-      ctxt.image_manager_ready = false;
-      tf_bcaster = new tf2_ros::TransformBroadcaster;
-      static_tf_bcaster = new tf2_ros::StaticTransformBroadcaster;
-      tf_buffer = new tf2_ros::Buffer;
-      tf_listener = new tf2_ros::TransformListener(*tf_buffer);
-      map_to_odom.header.frame_id = "map";
-      map_to_odom.child_frame_id = tango_odom;
-      map_to_odom.transform.translation.x = 0;
-      map_to_odom.transform.translation.y = 0;
-      map_to_odom.transform.translation.z = 0;
-      map_to_odom.transform.rotation.x = 0;
-      map_to_odom.transform.rotation.y = 0;
-      map_to_odom.transform.rotation.z = 0;
-      map_to_odom.transform.rotation.w = 1;
-      odom_to_base.header.frame_id = tango_odom;
-      odom_to_base.child_frame_id = tango_base_link;
-      odom_to_base.transform.translation.x = 0;
-      odom_to_base.transform.translation.y = 0;
-      odom_to_base.transform.translation.z = 0;
-      odom_to_base.transform.rotation.x = 0;
-      odom_to_base.transform.rotation.y = 0;
-      odom_to_base.transform.rotation.z = 0;
-      odom_to_base.transform.rotation.w = 1;
-      base_to_pose.header.frame_id = tango_base_link;
-      base_to_pose.child_frame_id = tango_pose;
-      base_to_pose.transform.translation.x = 0;
-      base_to_pose.transform.translation.y = 0;
-      base_to_pose.transform.translation.z = 0;
-      base_to_pose.transform.rotation.x = -0.5;
-      base_to_pose.transform.rotation.y = 0.5;
-      base_to_pose.transform.rotation.z = 0.5;
-      base_to_pose.transform.rotation.w = 0.5;
-      base_to_depth.header.frame_id = tango_base_link;
-      base_to_depth.child_frame_id = tango_camera_depth;
-      base_to_color.header.frame_id = tango_base_link;
-      base_to_color.child_frame_id = tango_camera_color;
-      pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
-      img_pub = (ctxt.nh)->advertise<sensor_msgs::Image>("tango_image_color", 1);
-      known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
-      int version = 0;
-      TangoErrorType err = TangoSupport_GetTangoVersion(env, caller_activity, &version);
-      if (err != TANGO_SUCCESS || version < kTangoCoreMinimumVersion) {
-        LOGE(
-            "TangoNativeStreamingApp::OnCreate, Tango Core version is out"
-            " of date.");
-        std::exit(EXIT_SUCCESS);
-      }
-  } else {
-        LOGI("NO ROS MASTER.");
-        //std::exit(EXIT_SUCCESS);
-        jfieldID fidErr = env->GetFieldID(thisClass, "nativeError", "Z");
-        jboolean err = true;
-        env->SetBooleanField(caller_activity, fidErr, err);
-        error = true;
-        return;
+  LOGI("%s", master_uri.c_str());
+  ctxt.pose_mutex_ptr = &pose_mutex;
+  ctxt.odom_to_base_ptr = &odom_to_base;
+  ctxt.nh = new ros::NodeHandle(tango_namespace);
+  ctxt.image_manager_ready = false;
+  tf_bcaster = new tf2_ros::TransformBroadcaster;
+  static_tf_bcaster = new tf2_ros::StaticTransformBroadcaster;
+  tf_buffer = new tf2_ros::Buffer;
+  tf_listener = new tf2_ros::TransformListener(*tf_buffer);
+  map_to_odom.header.frame_id = "map";
+  map_to_odom.child_frame_id = tango_odom;
+  map_to_odom.transform.translation.x = 0;
+  map_to_odom.transform.translation.y = 0;
+  map_to_odom.transform.translation.z = 0;
+  map_to_odom.transform.rotation.x = 0;
+  map_to_odom.transform.rotation.y = 0;
+  map_to_odom.transform.rotation.z = 0;
+  map_to_odom.transform.rotation.w = 1;
+  odom_to_base.header.frame_id = tango_odom;
+  odom_to_base.child_frame_id = tango_base_link;
+  odom_to_base.transform.translation.x = 0;
+  odom_to_base.transform.translation.y = 0;
+  odom_to_base.transform.translation.z = 0;
+  odom_to_base.transform.rotation.x = 0;
+  odom_to_base.transform.rotation.y = 0;
+  odom_to_base.transform.rotation.z = 0;
+  odom_to_base.transform.rotation.w = 1;
+  base_to_pose.header.frame_id = tango_base_link;
+  base_to_pose.child_frame_id = tango_pose;
+  base_to_pose.transform.translation.x = 0;
+  base_to_pose.transform.translation.y = 0;
+  base_to_pose.transform.translation.z = 0;
+  base_to_pose.transform.rotation.x = -0.5;
+  base_to_pose.transform.rotation.y = 0.5;
+  base_to_pose.transform.rotation.z = 0.5;
+  base_to_pose.transform.rotation.w = 0.5;
+  base_to_depth.header.frame_id = tango_base_link;
+  base_to_depth.child_frame_id = tango_camera_depth;
+  base_to_color.header.frame_id = tango_base_link;
+  base_to_color.child_frame_id = tango_camera_color;
+  pc_pub = (ctxt.nh)->advertise<sensor_msgs::PointCloud2>("tango_image_depth", 1);
+  img_pub = (ctxt.nh)->advertise<sensor_msgs::Image>("tango_image_color", 1);
+  known_pose_sub = (ctxt.nh)->subscribe("initial_pose", 1, &TangoNativeStreamingApp::SetCurrentPoseCallback, this);
+  int version = 0;
+  TangoErrorType err = TangoSupport_GetTangoVersion(env, caller_activity, &version);
+  if (err != TANGO_SUCCESS || version < kTangoCoreMinimumVersion) {
+    LOGE(
+        "TangoNativeStreamingApp::OnCreate, Tango Core version is out"
+        " of date.");
+    std::exit(EXIT_SUCCESS);
   }
+  } else {
+  LOGI("NO ROS MASTER.");
+          //std::exit(EXIT_SUCCESS);
+          jfieldID fidErr = env->GetFieldID(thisClass, "nativeError", "Z");
+          jboolean err = true;
+          env->SetBooleanField(caller_activity, fidErr, err);
+          error = true;
+          //return;
+          }
 }
 }  // namespace
