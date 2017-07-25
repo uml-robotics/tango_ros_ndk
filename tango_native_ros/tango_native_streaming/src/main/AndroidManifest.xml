@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="edu.uml.tango.tangonativeros.tangonativestreaming"
     android:versionCode="0"
-    android:versionName="0" >
+    android:versionName="0">
     <uses-sdk
         android:minSdkVersion="19"
         android:targetSdkVersion="19"
@@ -31,7 +32,8 @@
             android:name=".NativeStreamingActivity"
             android:screenOrientation="nosensor"
             android:noHistory="false"
-            android:parentActivityName=".SettingsActivity">
+            android:parentActivityName=".SettingsActivity"
+            android:configChanges="uiMode">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
@@ -43,7 +45,8 @@
             android:name=".SettingsActivity"
             android:screenOrientation="nosensor"
             android:noHistory="false"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:configChanges="uiMode">
             <intent-filter android:label="Tango Native ROS Settings">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
